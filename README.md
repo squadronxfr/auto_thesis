@@ -7,4 +7,4 @@ Auto Thesis is an AI-powered tool designed to make the entire thesis writing pro
 - Python
 - FastAPI
 - React
-- GeminiAPI
+- Gemini API
