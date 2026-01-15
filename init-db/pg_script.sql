@@ -7,7 +7,9 @@ CREATE TABLE users (
     last_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('ADMIN', 'CLIENT'))
+    role TEXT NOT NULL CHECK (role IN ('ADMIN', 'USER')),
+    created_at  TIMESTAMP NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMP NOT NULL DEFAULT now()
 );
 
  
@@ -17,6 +19,7 @@ CREATE TABLE token (
     id BIGSERIAL PRIMARY KEY,
     token_string TEXT NOT NULL UNIQUE,
     user_id BIGINT NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT now(),
 
     CONSTRAINT fk_token_user
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -30,18 +33,20 @@ CREATE TABLE request (
     name TEXT NOT NULL,
     status TEXT NOT NULL CHECK (status IN ('IN_PROGRESS', 'COMPLETED')),
     user_id BIGINT NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT now(),
 
     CONSTRAINT fk_request_user
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
  
--- ACTIVITY (request progress tracking)
+-- ACTIVITY
  
 CREATE TABLE activity (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     request_id BIGINT NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT now(),
 
     CONSTRAINT fk_activity_request
         FOREIGN KEY (request_id) REFERENCES request(id) ON DELETE CASCADE
@@ -57,6 +62,7 @@ CREATE TABLE document (
     document_type TEXT NOT NULL CHECK (document_type IN ('SOURCE', 'FINAL')),
     request_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT now(),
 
     CONSTRAINT fk_document_request
         FOREIGN KEY (request_id) REFERENCES request(id) ON DELETE CASCADE,
@@ -72,7 +78,9 @@ CREATE TABLE request_step (
     id BIGSERIAL PRIMARY KEY,
     request_id BIGINT NOT NULL,
     order_index INTEGER NOT NULL,
+    token_cost INTEGER NOT NULL,
     content TEXT NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT now(),
 
     CONSTRAINT fk_request_step_request
         FOREIGN KEY (request_id) REFERENCES request(id) ON DELETE CASCADE,
