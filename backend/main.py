@@ -1,42 +1,30 @@
-# Dans main.py
-#from fastapi import FastAPI
-#from agents.judge import JudgeAgent
-#from pydantic import BaseModel
-
-#app = FastAPI()
-
-# Modèle pour tester l'API
-#class JudgeRequest(BaseModel):
- #   draft_text: str
-  #  requirements: str
-
-#@app.post("/agents/judge/evaluate")
-#async def run_judge(request: JudgeRequest):
- #   agent = JudgeAgent()
-    # On lance l'évaluation
-  #  result = await agent.evaluate_text(request.draft_text, request.requirements)
-   # return result
-
-
-
-
 from fastapi import FastAPI
-# Correction ici : on utilise "agent" (singulier) partout
+# Imports du Juge
 from agent.judge import JudgeAgent
 from agent.judge_schema import JudgeInput
 
-app = FastAPI(title="AutoThesis API", version="2.0")
+# Imports de l'Écrivain (Nouveau !)
+from agent.writer import WriterAgent
+from agent.writer_schema import WriterInput
 
-# J'ai aussi corrigé la route pour qu'elle soit cohérente : /agent/...
+app = FastAPI(title="AutoThesis API", version="2.1")
+
+# --- ROUTE DU JUGE (EXISTANTE) ---
 @app.post("/agent/judge/evaluate")
 async def run_judge(input_data: JudgeInput):
     """
-    Endpoint V2 du Juge.
-    Attend un objet JSON complet avec le texte, le type de section, le contexte et les sources.
+    Endpoint du Juge : Évalue une section déjà rédigée.
     """
     agent = JudgeAgent()
-    
-    # On appelle la nouvelle méthode intelligente "evaluate_full_context"
     result = await agent.evaluate_full_context(input_data)
-    
+    return result
+
+# --- ROUTE DE L'ÉCRIVAIN (NOUVELLE) ---
+@app.post("/agent/writer/generate")
+async def run_writer(input_data: WriterInput):
+    """
+    Endpoint de l'Écrivain : Rédige une section selon un mode précis (Méthodo, Problématique...).
+    """
+    agent = WriterAgent()
+    result = await agent.generate_draft(input_data)
     return result
