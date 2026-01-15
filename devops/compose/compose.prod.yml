@@ -1,21 +1,27 @@
 services:
   postgres:
+    image: postgres:16
+    build: null
     restart: unless-stopped
+    # si tu veux exécuter les scripts init en prod aussi :
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ../../DB/init-db:/docker-entrypoint-initdb.d:ro
 
   redis:
+    image: redis:7
+    build: null
     restart: unless-stopped
-
-  backend:
-    restart: unless-stopped
-
-  mcp:
-    restart: unless-stopped
-
-  agents:
-    restart: unless-stopped
+    volumes:
+      - redis_data:/data
 
   frontend:
+    image: ghcr.io/${GHCR_OWNER}/auto_thesis-frontend:${APP_VERSION}
+    build: null
     restart: unless-stopped
+    ports:
+      - "${FRONTEND_HOST_PORT:-3000}:3000"
 
-  # nginx:
-  #   restart: unless-stopped
+volumes:
+  pg_data:
+  redis_data:

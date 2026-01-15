@@ -11,6 +11,9 @@
 *.sln.docstates
 *.env
 
+# Les dossiers à ne pas envoyer
+
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
