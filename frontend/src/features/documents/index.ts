@@ -1,0 +1,1 @@
+export { DashboardCustomer } from './DashboardCustomer';

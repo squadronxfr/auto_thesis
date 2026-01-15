@@ -13,6 +13,7 @@ import { Login, Register, ForgotPassword } from '@/features/auth';
 import { LandingPage } from '@/features/landing';
 import { Profile } from '@/features/user';
 import { Users } from '@/features/users';
+import { DashboardCustomer } from '@/features/documents';
 
 import { useMetadata } from '@/lib/metadata';
 
@@ -53,11 +54,13 @@ export function AppRoutes() {
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
                             <Route path="/forgot-password" element={<ForgotPassword />} />
+                            <Route path="/dashboard" element={<DashboardCustomer />} />
                         </Route>
 
                         {/* Routes privées */}
                         <Route element={<PrivateRoutes />}>
                             <Route path="/app" element={<Navigate to="/profile" replace />} />
+                            <Route path="/dashboard" element={<DashboardCustomer />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/users" element={<Users />} />
                         </Route>
