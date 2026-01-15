@@ -1,17 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 import {
-    BarChart2,
-    Bell,
-    Bookmark,
     ChevronLeft,
-    HelpCircle,
     LayoutGrid,
-    MessageCircle,
     Rocket,
-    Settings,
+    User,
     Users,
 } from 'lucide-react';
 
@@ -24,24 +20,21 @@ interface SidebarItem {
 }
 
 export function Sidebar() {
-    const [isExpanded, setIsExpanded] = useState(true);
+    // Sidebar réduite sur mobile, étendue sur desktop
+    const [isExpanded, setIsExpanded] = useState(window.innerWidth >= 768);
+    const location = useLocation();
 
     const menuItems: SidebarItem[] = [
-        { icon: <LayoutGrid size={20} />, label: 'Dashboard', href: '#' },
-        { icon: <BarChart2 size={20} />, label: 'Analytics', href: '#' },
-        { icon: <Users size={20} />, label: 'Customers', href: '#' },
-        { icon: <MessageCircle size={20} />, label: 'Chats', href: '#' },
-        { icon: <Bookmark size={20} />, label: 'Subscriptions', href: '#' },
-        { icon: <Bell size={20} />, label: 'Notification', href: '#' },
-        { icon: <HelpCircle size={20} />, label: 'Support', href: '#' },
-        { icon: <Settings size={20} />, label: 'Settings', href: '#' },
+        { icon: <LayoutGrid size={20} />, label: 'Dashboard', href: '/dashboard' },
+        { icon: <User size={20} />, label: 'Profil', href: '/profile' },
+        { icon: <Users size={20} />, label: 'Utilisateurs', href: '/users' },
     ];
 
     return (
         <motion.div
             animate={{ width: isExpanded ? '240px' : '70px' }}
             transition={{ duration: 0.3 }}
-            className="relative flex h-screen flex-col bg-gradient-to-b from-[#0A0A29] to-[#0A0A1F] p-4 text-white"
+            className="sticky top-0 h-screen flex-col bg-gradient-to-b from-[#0A0A29] to-[#0A0A1F] p-2 md:p-4 text-white flex-shrink-0 flex"
         >
             {/* Toggle Button */}
             <button
@@ -81,29 +74,38 @@ export function Sidebar() {
 
             {/* Navigation Items */}
             <nav className="flex-1 space-y-2">
-                {menuItems.map((item) => (
-                    <a
-                        key={item.label}
-                        href={item.href}
-                        className="group flex items-center gap-4 rounded-lg p-2 text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
-                    >
-                        <span className="flex-shrink-0 transition-colors group-hover:text-blue-400">
-                            {item.icon}
-                        </span>
-                        <AnimatePresence>
-                            {isExpanded && (
-                                <motion.span
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -10 }}
-                                    className="whitespace-nowrap text-sm"
-                                >
-                                    {item.label}
-                                </motion.span>
-                            )}
-                        </AnimatePresence>
-                    </a>
-                ))}
+                {menuItems.map((item) => {
+                    const isActive = location.pathname === item.href;
+                    return (
+                        <Link
+                            key={item.label}
+                            to={item.href}
+                            className={`group flex items-center gap-4 rounded-lg p-2 transition-colors ${
+                                isActive 
+                                    ? 'bg-[#126FFF]/20 text-white border border-[#126FFF]/30' 
+                                    : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                            }`}
+                        >
+                            <span className={`flex-shrink-0 transition-colors ${
+                                isActive ? 'text-[#126FFF]' : 'group-hover:text-[#126FFF]'
+                            }`}>
+                                {item.icon}
+                            </span>
+                            <AnimatePresence>
+                                {isExpanded && (
+                                    <motion.span
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -10 }}
+                                        className="whitespace-nowrap text-sm"
+                                    >
+                                        {item.label}
+                                    </motion.span>
+                                )}
+                            </AnimatePresence>
+                        </Link>
+                    );
+                })}
             </nav>
 
             {/* Pro Access Button */}
