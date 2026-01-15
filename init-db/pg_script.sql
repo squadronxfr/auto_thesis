@@ -90,6 +90,21 @@ CREATE TABLE request_step (
 );
 
  
+-- SOURCE
+ 
+CREATE TABLE SOURCE (
+    id BIGSERIAL PRIMARY KEY,
+    document_id BIGINT NOT NULL,
+    title TEXT NOT NULL,
+    summary TEXT,
+    link TEXT NOT NULL,
+    date DATE,
+    CONSTRAINT fk_source_document
+        FOREIGN KEY (document_id) REFERENCES document(id) ON DELETE CASCADE
+);
+
+
+ 
 -- INDEXES (performance)
  
 CREATE INDEX idx_token_user_id ON token(user_id);
@@ -98,3 +113,4 @@ CREATE INDEX idx_activity_request_id ON activity(request_id);
 CREATE INDEX idx_document_request_id ON document(request_id);
 CREATE INDEX idx_document_user_id ON document(user_id);
 CREATE INDEX idx_request_step_request_id ON request_step(request_id);
+CREATE INDEX idx_source_document_id ON source(document_id);
