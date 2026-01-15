@@ -420,3 +420,5 @@ FodyWeavers.xsd
 .venv
 .idea
 .vscode
+/backend/.venv
+/backend/.env
