@@ -1,8 +1,11 @@
 services:
   postgres:
     image: postgres:16
-    build: null
     restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
     # si tu veux exécuter les scripts init en prod aussi :
     volumes:
       - pg_data:/var/lib/postgresql/data
@@ -10,14 +13,12 @@ services:
 
   redis:
     image: redis:7
-    build: null
     restart: unless-stopped
     volumes:
       - redis_data:/data
 
   frontend:
     image: ghcr.io/${GHCR_OWNER}/auto_thesis-frontend:${APP_VERSION}
-    build: null
     restart: unless-stopped
     ports:
       - "${FRONTEND_HOST_PORT:-3000}:3000"
