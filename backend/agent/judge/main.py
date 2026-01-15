@@ -1,7 +1,8 @@
-# Dans main.py
 from fastapi import FastAPI
 from agents.judge import JudgeAgent
 from pydantic import BaseModel
+from backend.config import Config
+import uvicorn
 
 app = FastAPI()
 
@@ -21,5 +22,5 @@ async def run_judge(request: JudgeRequest):
     return result
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+    print(f"Host : {Config.HOST}")
+    uvicorn.run(app, host=Config.HOST, port=Config.PORT, reload=True)
