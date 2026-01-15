@@ -70,11 +70,11 @@ const DEFAULT_CONFIG = {
     siteName: 'Auto Thesis',
     author: 'Auto Thesis',
     viewport: 'width=device-width, initial-scale=1.0',
-    defaultDescription: 'Application de gestion financière pour optimiser votre cash flow',
-    defaultKeywords: 'cash flow, finance, gestion, positif, application',
-    baseUrl: typeof window !== 'undefined' ? window.location.origin : 'https://cashflowpositif.com',
+    defaultDescription: 'Application de génération de mémoire',
+    defaultKeywords: 'mémoire, génération, auto, thesis',
+    baseUrl: typeof window !== 'undefined' ? window.location.origin : 'https://auto-thesis.com',
     defaultOgImage: '/og-image.jpg',
-    twitterSite: '@cashflowpositif',
+    twitterSite: '@AutoThesisApp',
 };
 
 /**

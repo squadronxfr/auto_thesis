@@ -87,11 +87,7 @@ export default {
                 lineThroughHide: {
                     '0%': { transform: 'scaleX(1)' },
                     '100%': { transform: 'scaleX(0)' },
-                },
-                lineGrow: {
-                    '0%': { height: '0%' },
-                    '100%': { height: '100%' },
-                },
+                }
             },
         },
     },

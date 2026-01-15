@@ -28,7 +28,7 @@ export function User() {
         title: 'Utilisateur',
         description: 'Auto Thesis - Utilisateur',
         keywords:
-            'cash flow, finance, gestion financière, comptabilité, budget, trésorerie, utilisateur',
+            'Auto Thesis, utilisateur, profil, compte',
     });
 
     /**

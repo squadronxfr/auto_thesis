@@ -525,7 +525,7 @@ export default function LandingPage() {
             <p className="text-slate-400 text-lg">Un projet open-source développé par une équipe passionnée d'IA et d'éducation.</p>
           </div>
           <a 
-            href="https://github.com/auto-thesis" 
+            href="https://github.com/squadronxfr/auto_thesis" 
             target="_blank" 
             rel="noreferrer"
             className="flex items-center gap-2 text-slate-400 hover:text-white font-mono text-sm bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:border-white/20 transition-all"
@@ -632,7 +632,7 @@ export default function LandingPage() {
               Engineering the next generation of autonomous intelligence. Open source, deterministic, and built for scale.
             </p>
             <div className="flex gap-4">
-              <a href="https://github.com/auto-thesis" target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#126FFF] hover:text-white transition-colors"><Github size={20} /></a>
+              <a href="https://github.com/squadronxfr/auto_thesis" target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#126FFF] hover:text-white transition-colors"><Github size={20} /></a>
             </div>
           </div>
           <div>
@@ -645,7 +645,7 @@ export default function LandingPage() {
           <div>
             <h4 className="text-white font-bold mb-6">Communauté</h4>
             <ul className="space-y-4 text-slate-500 text-sm">
-              <li><a href="https://github.com/auto-thesis" target="_blank" rel="noreferrer" className="hover:text-[#126FFF] transition-colors">GitHub</a></li>
+              <li><a href="https://github.com/squadronxfr/auto_thesis" target="_blank" rel="noreferrer" className="hover:text-[#126FFF] transition-colors">GitHub</a></li>
             </ul>
           </div>
         </div>

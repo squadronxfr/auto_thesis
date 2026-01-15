@@ -11,7 +11,7 @@ export function Profile() {
         title: 'Profil',
         description: 'Auto Thesis - Profil',
         keywords:
-            'cash flow, finance, gestion financière, comptabilité, budget, trésorerie, profil',
+            'Auto Thesis, profil, utilisateur, compte',
     });
 
     if (!user) {
