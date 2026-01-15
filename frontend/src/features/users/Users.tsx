@@ -76,7 +76,7 @@ export function Users() {
                     });
                 } else {
                     updateFilters({
-                        firstName: undefined,
+                        first_name: undefined,
                         search: undefined,
                     });
                 }
@@ -140,9 +140,9 @@ export function Users() {
                             <input
                                 type="text"
                                 placeholder="Prénom..."
-                                value={filters.firstName || ''}
+                                value={filters.first_name || ''}
                                 onChange={(e) =>
-                                    updateFilters({ firstName: e.target.value || undefined })
+                                    updateFilters({ first_name: e.target.value || undefined })
                                 }
                                 className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 transition duration-150 ease-in-out focus:z-10 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary sm:text-sm"
                             />
@@ -154,9 +154,9 @@ export function Users() {
                             <input
                                 type="text"
                                 placeholder="Nom..."
-                                value={filters.lastName || ''}
+                                value={filters.last_name || ''}
                                 onChange={(e) =>
-                                    updateFilters({ lastName: e.target.value || undefined })
+                                    updateFilters({ last_name: e.target.value || undefined })
                                 }
                                 className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 transition duration-150 ease-in-out focus:z-10 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary sm:text-sm"
                             />
@@ -238,7 +238,7 @@ export function Users() {
                             </TableHeader>
                             <TableBody>
                                 {users.map((user) => {
-                                    const nameParts = `${user.firstName} ${user.lastName}`
+                                    const nameParts = `${user.first_name} ${user.last_name}`
                                         .trim()
                                         .split(/\s+/);
                                     const firstInitial = nameParts[0]?.[0]?.toUpperCase() || '?';
@@ -247,7 +247,7 @@ export function Users() {
                                         nameParts[0]?.[1]?.toUpperCase() ||
                                         '?';
                                     const initials = `${firstInitial}${secondInitial}`;
-                                    const fullName = `${user.firstName} ${user.lastName}`;
+                                    const fullName = `${user.first_name} ${user.last_name}`;
                                     const createdAt = new Date(user.createdAt).toLocaleDateString(
                                         'fr-FR'
                                     );

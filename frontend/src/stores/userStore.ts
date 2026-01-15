@@ -3,15 +3,15 @@ import { create } from 'zustand';
 interface UserState {
     id: string | null;
     email: string | null;
-    firstName: string | null;
-    lastName: string | null;
+    first_name: string | null;
+    last_name: string | null;
     phone: string | null;
     avatarUrl?: string;
     setUser: (user: {
         id: string;
         email: string;
-        firstName: string;
-        lastName: string;
+        first_name: string;
+        last_name: string;
         phone: string;
         avatarUrl?: string;
     }) => void;
@@ -21,22 +21,22 @@ interface UserState {
 export const useAuthStore = create<UserState>()((set) => ({
     id: null,
     email: null,
-    firstName: null,
-    lastName: null,
+    first_name: null,
+    last_name: null,
     phone: null,
     avatarUrl: undefined,
     setUser: (user: {
         id: string;
         email: string;
-        firstName: string;
-        lastName: string;
+        first_name: string;
+        last_name: string;
         phone: string;
         avatarUrl?: string;
     }) =>
         set(() => ({
             id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            first_name: user.first_name,
+            last_name: user.last_name,
             email: user.email,
             phone: user.phone,
             avatarUrl: user.avatarUrl,
@@ -44,8 +44,8 @@ export const useAuthStore = create<UserState>()((set) => ({
     clearUser: () =>
         set(() => ({
             id: null,
-            firstName: null,
-            lastName: null,
+            first_name: null,
+            last_name: null,
             email: null,
             phone: null,
             avatarUrl: undefined,

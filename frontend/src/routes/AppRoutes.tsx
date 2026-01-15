@@ -18,6 +18,7 @@ import { DashboardCustomer } from '@/features/documents';
 import { useMetadata } from '@/lib/metadata';
 
 import { useAuthStore } from '@/stores/authStore';
+import { AdminDashboard } from '@/features/admin';
 
 export function AppRoutes() {
     const { isAuthenticated } = useAuthStore();
@@ -55,12 +56,14 @@ export function AppRoutes() {
                             <Route path="/register" element={<Register />} />
                             <Route path="/forgot-password" element={<ForgotPassword />} />
                             <Route path="/dashboard" element={<DashboardCustomer />} />
+                            <Route path="/admin" element={<AdminDashboard />} />
                         </Route>
 
                         {/* Routes privées */}
                         <Route element={<PrivateRoutes />}>
                             <Route path="/app" element={<Navigate to="/profile" replace />} />
                             <Route path="/dashboard" element={<DashboardCustomer />} />
+                            <Route path="/admin" element={<AdminDashboard />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/users" element={<Users />} />
                         </Route>

@@ -2,8 +2,8 @@ import type { UserDto } from '@/schemas';
 
 // Données d'inscription
 export interface RegisterCredentials {
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     email: string;
     phone: string;
 }
