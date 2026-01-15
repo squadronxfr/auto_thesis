@@ -1,16 +1,33 @@
-import os
-from dotenv import load_dotenv
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import List
+from pathlib import Path
 
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-class Config:
-    SECRET_KEY = os.getenv("SECRET_KEY", "")
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-    DATABASE_URL = os.getenv("DATABASE_URL", "")
-    HOST = os.getenv("HOST", "127.0.0.1")
-    PORT = int(os.getenv("PORT", 8000))
-    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "")
-    ALLOWED_HOSTS = ALLOWED_HOSTS.split(",") if ALLOWED_HOSTS else []
-    ALGORITHM = os.getenv("ALGORITHM", "")
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=str(BASE_DIR / ".env"),
+        env_file_encoding="utf-8",
+        case_sensitive=True
+    )
 
-config = Config()
+    SECRET_KEY: str
+    GEMINI_API_KEY: str
+    DATABASE_URL: str
+    HOST: str
+    PORT: int
+    ALGORITHM: str
+    ALLOWED_HOSTS: str
+    DATABASE_HOST: str = "0.tcp.eu.ngrok.io"
+    DATABASE_PORT: int = 19445
+    DATABASE_NAME: str = "appdb"
+    DATABASE_USER: str = "samuel"
+    DATABASE_PASSWORD: str = "samuel123"
+    SSL: bool = False
+
+    @property
+    def allowed_hosts_list(self) -> List[str]:
+        return [h.strip() for h in self.ALLOWED_HOSTS.split(",") if h.strip()]
+
+
+settings = Settings()

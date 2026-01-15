@@ -1,54 +1,45 @@
-# user.py
-from fastapi import HTTPException, APIRouter
+from fastapi import APIRouter
 from pydantic import BaseModel
 import bcrypt
 import uuid
 from backend.config import settings
 from jose import jwt
-# from db.config import db
 
 user_router = APIRouter()
 
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
+
+
 class RegisterRequest(BaseModel):
     name: str
     email: str
     password: str
     user_type: str
 
+
 class LoginRequest(BaseModel):
     email: str
     password: str
 
+
 @user_router.post("/register")
 async def register_user(user: RegisterRequest):
-    users_collection = db["users"]
-    if users_collection.find_one({"email": user.email}):
-        raise HTTPException(status_code=400, detail="L'utilisateur existe déjà")
-
     hashed_pw = bcrypt.hashpw(user.password.encode(), bcrypt.gensalt())
     user_id = str(uuid.uuid4())
-    token = jwt.encode({"user_id": user_id}, SECRET_KEY, algorithm=ALGORITHM)
+    token = jwt.encode(
+        {"user_id": user_id},
+        SECRET_KEY,
+        algorithm=ALGORITHM
+    )
 
-    users_collection.insert_one({
-        "user_id": user_id,
-        "email": user.email,
-        "password": hashed_pw.decode(),
+    return {
+        "message": "Utilisateur créé avec succès",
         "token": token,
-        "name": user.name,
-        "user_type": user.user_type,
-    })
+        "user_id": user_id
+    }
 
-    return {"token": token, "user_id": user_id, "user_type": user.user_type}
 
 @user_router.post("/login")
-async def login_user(user: LoginRequest):
-    users_collection = db["users"]
-    found_user = users_collection.find_one({"email": user.email})
-
-    if not found_user or not bcrypt.checkpw(user.password.encode(), found_user["password"].encode()):
-        raise HTTPException(status_code=400, detail="Identifiants invalides")
-
-    token = jwt.encode({"user_id": found_user["user_id"]}, SECRET_KEY, algorithm=ALGORITHM)
-    return {"token": token, "user_id": found_user["user_id"], "user_type": found_user["user_type"]}
+async def login_user(credentials: LoginRequest):
+    return {"message": "Login endpoint", "email": credentials.email}
