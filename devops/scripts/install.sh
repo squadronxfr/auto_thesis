@@ -1,26 +1,29 @@
-#!/bin/bash
-# Strict mode : on arrête tout si une commande échoue
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-PROJECT_DIR="/opt/multi-agent-app"
-cd $PROJECT_DIR
+APP_DIR="${APP_DIR:-/opt/apps/auto_thesis}"
+REPO_URL="${REPO_URL:-https://github.com/squadronxfr/auto_thesis.git}"
+BRANCH="${BRANCH:-scrum-23/deploiement_template_docker}"
 
-echo "--- 1. Authentification à la Registry ---"
-# Utilisation du jeton passé par GitHub Actions pour récupérer les images buildées
-echo "$GITHUB_TOKEN" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+mkdir -p "$APP_DIR"
+cd "$APP_DIR"
 
-echo "--- 2. Récupération des dernières images (O(1) transfer) ---"
-# On télécharge les images pré-construites (backend, agents, etc.)
-docker compose pull
+if [[ ! -d .git ]]; then
+  git clone -b "$BRANCH" "$REPO_URL" .
+else
+  git fetch origin "$BRANCH"
+  git checkout "$BRANCH"
+  git pull --rebase origin "$BRANCH"
+fi
 
-echo "--- 3. Mise à jour des conteneurs ---"
-# --remove-orphans : supprime les anciens agents si vous avez renommé un service
-# -d : mode détaché (arrière-plan)
-docker compose up -d --remove-orphans
+# Login GHCR (utilise un PAT, pas le token "GITHUB_TOKEN" de GitHub Actions)
+: "${GHCR_USERNAME:?Set GHCR_USERNAME}"
+: "${GHCR_TOKEN:?Set GHCR_TOKEN}"
 
-echo "--- 4. Nettoyage de sécurité ---"
-# Supprime les images "dangling" (les anciennes versions qui prennent de la place)
-docker image prune -f
+echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 
-echo "--- Statut du déploiement ---"
-docker compose ps
+docker compose --env-file devops/.env -f devops/compose/compose.prod.yml pull
+docker compose --env-file devops/.env -f devops/compose/compose.prod.yml up -d --remove-orphans
+
+echo "✅ Install/Deploy terminé"
+docker compose --env-file devops/.env -f devops/compose/compose.prod.yml ps

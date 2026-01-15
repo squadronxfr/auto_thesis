@@ -2,7 +2,8 @@ name: Build & Push Frontend (GHCR)
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - "scrum-23/deploiement_template_docker"
     tags: ["v*"]
 
 jobs:
