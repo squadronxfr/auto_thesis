@@ -13,4 +13,4 @@ class Config:
     ALLOWED_HOSTS = ALLOWED_HOSTS.split(",") if ALLOWED_HOSTS else []
     ALGORITHM = os.getenv("ALGORITHM", "")
 
-Config = Config()
+config = Config()

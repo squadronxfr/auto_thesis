@@ -3,15 +3,14 @@ from fastapi import HTTPException, APIRouter
 from pydantic import BaseModel
 import bcrypt
 import uuid
-from backend.config import Config
+from backend.config import settings
 from jose import jwt
 # from db.config import db
 
 user_router = APIRouter()
 
-SECRET_KEY = Config.SECRET_KEY
-ALGORITHM = Config.ALGORITHM
-
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
 class RegisterRequest(BaseModel):
     name: str
     email: str
