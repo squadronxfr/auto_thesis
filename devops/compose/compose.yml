@@ -1,0 +1,122 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-memoire}_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-memoire}_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: ../../backend
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-memoire}_backend
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      BACKEND_PORT: ${BACKEND_PORT:-8080}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - "${BACKEND_PORT:-8080}"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:$${BACKEND_PORT:-8080}/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  mcp:
+    build:
+      context: ../../mcp
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-memoire}_mcp
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      MCP_PORT: ${MCP_PORT:-8081}
+      REDIS_URL: ${REDIS_URL}
+    depends_on:
+      redis:
+        condition: service_healthy
+    expose:
+      - "${MCP_PORT:-8081}"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:$${MCP_PORT:-8081}/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  agents:
+    build:
+      context: ../../agents
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      MCP_URL: ${MCP_URL}
+      AGENTS_CONCURRENCY: ${AGENTS_CONCURRENCY:-2}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mcp:
+        condition: service_healthy
+    # pas de ports : les agents n'ont pas besoin d'être exposés
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../../frontend
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-memoire}_frontend
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      FRONTEND_PORT: ${FRONTEND_PORT:-3000}
+      # utile si ton frontend appelle l'API via une variable au build/runtime
+      PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL:-/api}
+    expose:
+      - "${FRONTEND_PORT:-3000}"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # nginx:
+  #   image: nginx:1.27-alpine
+  #   container_name: ${COMPOSE_PROJECT_NAME:-ai-memoire}_nginx
+  #   depends_on:
+  #     frontend:
+  #       condition: service_started
+  #     backend:
+  #       condition: service_healthy
+  #     mcp:
+  #       condition: service_healthy
+  #   ports:
+  #     - "${HTTP_PORT:-80}:80"
+  #   volumes:
+  #     - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #   restart: unless-stopped
+
+volumes:
+  pg_data:
+  redis_data:

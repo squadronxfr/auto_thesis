@@ -1,0 +1,21 @@
+services:
+  postgres:
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+
+  backend:
+    restart: unless-stopped
+
+  mcp:
+    restart: unless-stopped
+
+  agents:
+    restart: unless-stopped
+
+  frontend:
+    restart: unless-stopped
+
+  # nginx:
+  #   restart: unless-stopped
