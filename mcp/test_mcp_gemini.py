@@ -182,7 +182,7 @@ class GeminiMCP:
     
     def test_tool_fetch_url(self):
         """Test 3: fetch_url_content"""
-        self._print_header("3. Tool: fetch_url_content")
+        self._print_header("2. Tool: fetch_url_content")
         result = self.mcp_call("fetch_url_content", {
             "search_query": "machine learning",
             "max_results": 2,
@@ -191,8 +191,8 @@ class GeminiMCP:
         return result.get('success', False)
     
     def test_tool_append_file(self):
-        """Test 4: append_to_file"""
-        self._print_header("4. Tool: append_to_file")
+        """Test 3: append_to_file"""
+        self._print_header("3. Tool: append_to_file")
         result = self.mcp_call("append_to_file", {
             "file_path": "test_output.md",
             "content": f"# Test\nDate: {datetime.now().isoformat()}\n"
@@ -200,16 +200,16 @@ class GeminiMCP:
         return result.get('success', False)
     
     def test_tool_read_pdf(self):
-        """Test 5: read_pdf"""
-        self._print_header("5. Tool: read_pdf")
+        """Test 4: read_pdf"""
+        self._print_header("4. Tool: read_pdf")
         result = self.mcp_call("read_pdf", {
             "file_path": "methodologie.pdf"
         })
         return result.get('success', False)
     
     def test_gemini_uses_mcp(self):
-        """Test 6: Gemini can request MCP tools"""
-        self._print_header("6. Gemini + MCP Integration")
+        """Test 5: Gemini can request MCP tools"""
+        self._print_header("5. Gemini + MCP Integration")
         
         prompt = """Use these tools:
 - USE_MCP[fetch_url_content]{"search_query":"Python","max_results":2}
@@ -249,7 +249,7 @@ Search and save."""
             self._print_error("Failed to read methodology")
             return False
         
-        method_text = methodology.get('result', {}).get('text', '')[:2000] #limiter la size pour les test pcq flemme c'est trop long
+        method_text = methodology.get('result', {}).get('text', '') # [:2000] Limit pcq trop long flemme
         self._print_info(f"Methodology loaded ({len(method_text)} chars)")
         
         self._print_info("Step 2: Searching web for content")
@@ -259,42 +259,55 @@ Search and save."""
             "fetch_content": True
         })
         
+        search_failed = False
         if not web_content.get('success'):
+            search_failed = True
             self._print_warn("Web search returned no results")
-            web_text = "No web content available"
+            web_text = ""
             web_results = []
         else:
-            results = web_content.get('result', {}).get('results', [])
+            result_data = web_content.get('result', {})
+            results = result_data.get('results', [])
+            search_success = result_data.get('search_success', len(results) > 0)
             
-            # Build structured sources for better Gemini citation
-            sources_list = []
-            web_text_parts = ["AVAILABLE SOURCES:"]
-            
-            for i, r in enumerate(results, 1):
-                title = r.get('title', f'Source {i}')
-                url = r.get('url', '')
-                content_snippet = r.get('content', '')[:300]
+            if not search_success or len(results) == 0:
+                search_failed = True
+                self._print_warn("Search engines unavailable")
+                web_text = ""
+                web_results = []
+            else:
+                sources_list = []
+                web_text_parts = ["AVAILABLE SOURCES:"]
                 
-                sources_list.append({
-                    'number': i,
-                    'title': title,
-                    'url': url
-                })
+                for i, r in enumerate(results, 1):
+                    title = r.get('title', f'Source {i}')
+                    url = r.get('url', '')
+                    content_snippet = r.get('content', '')[:300]
+                    
+                    sources_list.append({
+                        'number': i,
+                        'title': title,
+                        'url': url
+                    })
+                    
+                    web_text_parts.append(f"\n[{i}] Title: {title}")
+                    web_text_parts.append(f"URL: {url}")
+                    web_text_parts.append(f"Snippet: {content_snippet[:200]}...")
                 
-                web_text_parts.append(f"\n[{i}] Title: {title}")
-                web_text_parts.append(f"URL: {url}")
-                web_text_parts.append(f"Snippet: {content_snippet[:200]}...")
-            
-            web_text = "\n".join(web_text_parts)
-            web_results = results
-            self._print_info(f"Web content gathered from {len(results)} sources")
+                web_text = "\n".join(web_text_parts)
+                web_results = results
+                self._print_info(f"Web content gathered from {len(results)} sources")
         
-        # Save web research results as JSON
         self._print_info("Saving research results to JSON")
         self.mcp_call("append_to_file", {
             "file_path": "test/web_research.json",
             "content": json.dumps(web_results, indent=2, ensure_ascii=False)
         })
+        
+        if search_failed:
+            self._print_error("Cannot generate thesis: no web sources available")
+            self._print_info("Configure SEARXNG_URL or BRAVE_API_KEY in .env")
+            return False
         
         self._print_info("Step 3: Generating thesis with Gemini")
         
