@@ -44,6 +44,15 @@ class DocumentService {
     public async deleteDocument(documentId: string): Promise<ApiResponse<DocumentDto>> {
         return api.fetchRequest(`${this.apiUrl}/${documentId}`, 'DELETE', null, true);
     }
+
+    /**
+     * Upload un document (PDF) et lance le traitement de génération du mémoire
+     * @param formData - FormData contenant file, topic, et user_id
+     * @returns Response avec les données du traitement initié
+     */
+    public async generateDocument(formData: FormData): Promise<ApiResponse<DocumentDto>> {
+        return api.fetchRequest(`${this.apiUrl}/generate`, 'POST', formData, true);
+    }
 }
 
 export const documentService = new DocumentService();
