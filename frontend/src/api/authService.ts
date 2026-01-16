@@ -35,7 +35,7 @@ class AuthService {
         if (!accessToken) {
             return null;
         }
-        return api.fetchRequest('/api/auth/me', 'GET', null, true);
+        return api.fetchRequest('/auth/me', 'GET', null, true);
     }
 
     public async refreshToken(refreshToken: string): Promise<AuthResponse> {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight, Layers } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from "@/stores/authStore";
 
 export const Navbar = () => {
@@ -9,14 +9,14 @@ export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
   const isLandingPage = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
-    console.log(isAuthenticated)
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isAuthenticated]);
 
   const navLinks = [
     { name: "Fonctionnalités", href: "#features" },
@@ -70,23 +70,23 @@ export const Navbar = () => {
 
           {/* Right Action */}
           <div className="hidden md:flex items-center gap-4">
-            {!isAuthenticated ?
+            {isAuthenticated ?
               <button 
-              onClick={() => window.location.href = '/login'}
-              className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-            >
-              Connexion
-              </button>
-              :
-              <button 
-              onClick={() => window.location.href = '/upload'}
+                onClick={() => navigate('/upload')}
                 className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
               >
                 Upload
               </button>
+              :
+              <button 
+                onClick={() => navigate('/login')}
+                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+              >
+              Connexion
+              </button>
             }
             <button 
-              onClick={() => window.location.href = '/register'}
+              onClick={() => navigate('/register')}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#126FFF] hover:bg-[#126FFF]/90 text-sm font-semibold text-white transition-all shadow-lg shadow-[#126FFF]/20"
             >
               Démarrer
@@ -127,14 +127,24 @@ export const Navbar = () => {
                 </a>
               ))}
               <div className="pt-4 flex flex-col gap-3">
-                <button 
-                  onClick={() => window.location.href = '/login'}
+                {
+                  isAuthenticated ? (
+                    <button 
+                      onClick={() => navigate('/upload')}  
+                      className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 text-slate-200 font-medium hover:bg-white/10 transition-colors"
+                    >
+                      Upload
+                    </button>
+                  ) : 
+                    (<button 
+                  onClick={() => navigate('/login')}
                   className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 text-slate-200 font-medium hover:bg-white/10 transition-colors"
                 >
                   Connexion
-                </button>
+                </button>)
+                }
                 <button 
-                  onClick={() => window.location.href = '/register'}
+                  onClick={() => navigate('/register')}
                   className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#126FFF] text-white font-medium hover:bg-[#126FFF]/90 transition-colors"
                 >
                   Commencer gratuitement

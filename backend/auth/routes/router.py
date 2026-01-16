@@ -140,6 +140,43 @@ def login_user(credentials: LoginRequest, db: Session = Depends(get_db)):
         }
     }
 
+@user_router.get("/me")
+def get_me(authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
+    token_string = extract_bearer_token(authorization)
+
+    try:
+        payload = jwt.decode(token_string, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Token invalide")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token invalide ou expiré")
+
+    # Vérifier que le token est bien en base (session active)
+    token_valid = db.execute(
+        text("SELECT id FROM token WHERE token_string = :token"),
+        {"token": token_string}
+    ).fetchone()
+
+    if not token_valid:
+        raise HTTPException(status_code=401, detail="Session expirée")
+
+    user = db.execute(
+        text('SELECT id, first_name, last_name, email, role FROM "USER" WHERE id = :uid'),
+        {"uid": user_id}
+    ).fetchone()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+
+    return {
+        "id": user.id,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "role": user.role
+    }
+
 @user_router.post("/logout")
 def logout_user(authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
     token_string = extract_bearer_token(authorization)
