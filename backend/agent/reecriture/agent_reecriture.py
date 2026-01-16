@@ -30,7 +30,7 @@ class AgentReecriture(BaseAgent):
     
     def __init__(self):
         config = AgentConfig(
-            name="ReedacteurAcademique",
+            name="RedacteurAcademique",
             role="Spécialiste en Rédaction Académique",
             system_instruction="""
             Tu es un expert spécialisé en rédaction académique.
