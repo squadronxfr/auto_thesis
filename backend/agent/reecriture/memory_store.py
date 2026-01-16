@@ -87,8 +87,8 @@ class StockageMemoire:
         if self.client_redis:
             try:
                 self.client_redis.delete(cle)
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Erreur Redis DELETE: {e}, poursuite avec suppression locale")
         
         self.memoire_locale.pop(cle, None)
     
