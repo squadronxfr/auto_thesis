@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     
     MCP_URL: str = "http://localhost:3000"
     SSL: bool = False
+    GEMINI_MODEL_NAME: str
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_PASSWORD: str = ""
 
     @property
     def allowed_hosts_list(self) -> List[str]:
