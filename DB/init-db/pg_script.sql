@@ -18,7 +18,8 @@ CREATE TABLE TOKEN (
     token_string TEXT NOT NULL UNIQUE,
     user_id BIGINT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(), 
-    CONSTRAINT fk_token_user FOREIGN KEY (user_id) REFERENCES "USER"(id) ON DELETE CASCADE
+    CONSTRAINT fk_token_user
+        FOREIGN KEY (user_id) REFERENCES "USER"(id) ON DELETE CASCADE
 );
 
 CREATE TABLE REQUEST (
@@ -27,7 +28,8 @@ CREATE TABLE REQUEST (
     status TEXT NOT NULL CHECK (status IN ('IN_PROGRESS', 'COMPLETED')),
     user_id BIGINT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
-    CONSTRAINT fk_request_user FOREIGN KEY (user_id) REFERENCES "USER"(id) ON DELETE CASCADE
+    CONSTRAINT fk_request_user
+        FOREIGN KEY (user_id) REFERENCES "USER"(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ACTIVITY (
@@ -45,8 +47,10 @@ CREATE TABLE DOCUMENT (
     request_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
-    CONSTRAINT fk_document_request FOREIGN KEY (request_id) REFERENCES REQUEST(id) ON DELETE CASCADE,
-    CONSTRAINT fk_document_user FOREIGN KEY (user_id) REFERENCES "USER"(id) ON DELETE CASCADE
+    CONSTRAINT fk_document_request
+        FOREIGN KEY (request_id) REFERENCES REQUEST(id) ON DELETE CASCADE,
+    CONSTRAINT fk_document_user
+        FOREIGN KEY (user_id) REFERENCES "USER"(id) ON DELETE CASCADE
 );
 
 CREATE TABLE REQUEST_STEP (

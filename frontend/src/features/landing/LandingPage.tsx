@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui';
 import Galaxy from '@/components/Galaxy';
 import { Navbar } from '@/components/layout';
+import { useAuthStore } from '@/stores/userStore';
 
 const Section = ({ children, className = "", id = "" }: { children: React.ReactNode, className?: string, id?: string }) => (
   <section id={id} className={`py-20 px-6 md:px-12 max-w-7xl mx-auto ${className}`}>
@@ -97,12 +98,14 @@ const CONTRIBUTORS = [
   { name: "Souhir BEJI", github: "souhirbeji", avatar: "https://github.com/souhirbeji.png" },
   { name: "Medamine KORNITI", github: "MedAmine000", avatar: "https://github.com/MedAmine000.png" },
   { name: "Elyes ADDENRI", github: "Madoff77", avatar: "https://github.com/Madoff77.png" },
-  { name: "Lyes AIT TAYER", github: "lyesatb", avatar: "https://github.com/lyesatb.png" },
+  { name: "Lyes AIT TAYEB", github: "lyesatb", avatar: "https://github.com/lyesatb.png" },
   { name: "Rayan DZIRI", github: "DzRayane", avatar: "https://github.com/DzRayane.png" },
   { name: "Amine CHERIF", github: "Aminechf11", avatar: "https://github.com/Aminechf11.png" }
 ];
 
 export default function LandingPage() {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <div className="min-h-screen bg-[#0A0F1C] text-slate-200 selection:bg-[#126FFF]/30 selection:text-[#126FFF] overflow-x-hidden">
       <Navbar />
@@ -623,7 +626,8 @@ export default function LandingPage() {
           <div>
             <h4 className="text-white font-bold mb-6">Navigation</h4>
             <ul className="space-y-4 text-slate-500 text-sm">
-              <li><a href="/login" className="hover:text-[#126FFF] transition-colors">Connexion</a></li>
+              {!isAuthenticated ? <li><a href="/login" className="hover:text-[#126FFF] transition-colors">Connexion</a></li> : <li><a href="/upload" className="hover:text-[#126FFF] transition-colors">Upload</a></li>}
+              
               <li><a href="/register" className="hover:text-[#126FFF] transition-colors">Inscription</a></li>
             </ul>
           </div>
