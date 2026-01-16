@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 from .agent_reecriture import AgentReecriture
 from .rewrite_schema import (
@@ -19,7 +19,7 @@ class RewriteRequest(BaseModel):
     texte_brouillon: str
     critiques: List[dict]
     ids_sources_existantes: List[str] = []
-    contexte: str = None
+    contexte: Optional[str] = None
     iteration: int = 1
     id_document: str = "default"
 
