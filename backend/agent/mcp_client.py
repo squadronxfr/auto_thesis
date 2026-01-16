@@ -1,6 +1,5 @@
 import httpx
 from typing import List, Dict, Any, Optional
-from pydantic import BaseModel
 from backend.config.settings import settings
 
 class MCPClient:
