@@ -13,40 +13,9 @@ Voici le recensement exhaustif des pages, leur contenu et les routes associées 
 | `/register` | `Register` | 🌍 Public | **Inscription.** Processus de création de compte pour les nouveaux utilisateurs. Formulaire multi-étapes. |
 | `/forgot-password` | `ForgotPassword` | 🌍 Public | **Mot de passe oublié.** Formulaire pour initier la procédure de réinitialisation du mot de passe. |
 | `/dashboard` | `DashboardCustomer` | 🔒 Privé | **Tableau de bord client.** Espace principal pour l'utilisateur. Affiche la liste des mémoires générés, permet la prévisualisation PDF et le téléchargement. (Accessible aussi publiquement temporairement selon configuration routes). |
-| `/app` | - | 🔒 Privé | Redirection automatique vers `/profile`. |
-| `/profile` | `Profile` | 🔒 Privé | **Profil utilisateur.** Affiche les informations de l'utilisateur connecté (Email, Nom, Prénom, Rôles). |
-| `/users` | `Users` | 🔒 Privé | **Gestion des utilisateurs.** (Probablement Admin). Liste des utilisateurs avec recherche, filtres et pagination infinie. |
+| `/admin` | `AdminDashboard` | 🔒 Privé | **Tableau de bord admin.** Espace principal pour l'admin. Affiche la liste des utilisateurs, permet de contacter l'utilisateur par mail et filtrer par role. (Accessible aussi publiquement temporairement selon configuration routes). |
+| `/upload` | `UploadDocument` | 🔒 Privé | **Instruction pour la redaction du memoire** Espace pour l'utilisateur. Permet de donner les directives pour les agents tel que le sujet ainsi que le cahier des charges à upload en format PDF (Accessible aussi publiquement temporairement selon configuration routes). |
 | `/error` | `Error` | 🌍 Public | **Page d'erreur.** Affichage générique des erreurs. |
 | `*` | - | - | Redirection vers la page d'accueil `/`. |
 
-## 🏗️ Structure des Dossiers Clés
-
-- **`src/features`** : Contient les composants de pages regroupés par fonctionnalité (auth, landing, documents, user, users).
-- **`src/components`** : Composants réutilisables (UI kit, Layouts, etc.).
-- **`src/routes`** : Définition des routes (AppRoutes) et guards (PrivateRoutes, PublicRoutes).
-- **`src/api`** : Services pour les appels API backend.
-- **`src/stores`** : Gestion d'état global (Zustand).
-
-## 🚀 Installation et Démarrage
-
-### Prérequis
-- Node.js (v18+ recommandé)
-- pnpm (recommandé) ou npm
-
-### Installation des dépendances
-```bash
-cd frontend
-pnpm install
-```
-
-### Lancer le serveur de développement
-```bash
-pnpm dev
-```
-L'application sera accessible sur `http://localhost:5173` (port par défaut de Vite).
-
-### Construction pour la production
-```bash
-pnpm build
-```
-
+ 

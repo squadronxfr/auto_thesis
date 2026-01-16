@@ -18,8 +18,7 @@ class AuthService {
     public async registerUser(user: RegisterDto): Promise<AuthResponse> {
         const response = await api.fetchRequest('/auth/register', 'POST', user);
         if (response.token) {
-            Cookies.set('accessToken', response.accessToken, { expires: 1 });
-            Cookies.set('refreshToken', response.refreshToken, { expires: 30 });
+            Cookies.set('accessToken', response.token, { expires: 1 });
         }
         return response;
     }
@@ -45,14 +44,13 @@ class AuthService {
         });
         if (response.accessToken) {
             Cookies.set('accessToken', response.accessToken, { expires: 1 });
-            Cookies.set('refreshToken', response.refreshToken, { expires: 7 });
         }
         return response;
     }
 
     public async logout(refreshToken: string): Promise<ApiResponse<void>> {
         const request: RefreshTokenRequest = { token: refreshToken };
-        return api.fetchRequest('/logout', 'POST', request);
+        return api.fetchRequest('/auth/logout', 'POST', request);
     }
 
     public async updatePassword(password: UpdatePasswordDto): Promise<ApiResponse<void>> {
