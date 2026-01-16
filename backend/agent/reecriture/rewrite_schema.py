@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 class CritiqueJuge(BaseModel):
     """Judge's critique (original format without severity)."""
@@ -49,6 +49,6 @@ class SortieReecriture(BaseModel):
         description="Rewriting iteration number"
     )
     horodatage: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat(),
+        default_factory=lambda: datetime.now(timezone.utc).isoformat(),
         description="When this rewriting was performed (UTC ISO timestamp)"
     )

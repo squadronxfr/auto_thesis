@@ -1,13 +1,14 @@
 import os
 import json
+import logging
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 from pathlib import Path
-
+logger = logging.getLogger(__name__)
 # Load .env from backend directory (2 levels up from this file)
 env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
-
+ARTIFACT_TTL_SECONDS = 86400
 class StockageMemoire:
     """
     Stockage mémoire basé sur Redis avec repli en mémoire.
@@ -38,9 +39,9 @@ class StockageMemoire:
             )
             # Test de connexion
             self.client_redis.ping()
-            print("✓ Redis connecté avec succès")
+            logger.info("✓ Redis connecté avec succès")
         except Exception as e:
-            print(f"⚠ Redis indisponible ({e}), utilisation de la mémoire locale")
+            logger.warning(f"⚠ Redis indisponible ({e}), utilisation de la mémoire locale")
             self.client_redis = None
     
     def definir(self, cle: str, valeur: Any, expiration_secondes: Optional[int] = None):
@@ -54,7 +55,7 @@ class StockageMemoire:
                     self.client_redis.expire(cle, expiration_secondes)
                 return True
             except Exception as e:
-                print(f"Erreur Redis SET: {e}, utilisation repli local")
+                logger.error(f"Erreur Redis SET: {e}, utilisation repli local")
         
         # Repli local
         self.memoire_locale[cle] = serialisee
@@ -68,7 +69,7 @@ class StockageMemoire:
             try:
                 valeur = self.client_redis.get(cle)
             except Exception as e:
-                print(f"Erreur Redis GET: {e}, utilisation repli local")
+                logger.error(f"Erreur Redis GET: {e}, utilisation repli local")
         
         if valeur is None:
             valeur = self.memoire_locale.get(cle)
@@ -88,7 +89,7 @@ class StockageMemoire:
             try:
                 self.client_redis.delete(cle)
             except Exception as e:
-                print(f"Erreur Redis DELETE: {e}, poursuite avec suppression locale")
+                logger.error(f"Erreur Redis DELETE: {e}, poursuite avec suppression locale")
         
         self.memoire_locale.pop(cle, None)
     
@@ -120,7 +121,7 @@ class StockageMemoire:
     ):
         """Stocke un artefact de réécriture pour un document et itération spécifiques."""
         cle = f"reecriture:{id_document}:iteration:{iteration}"
-        self.definir(cle, artefact, expiration_secondes=86400)  # Expiration 24h
+        self.definir(cle, artefact, expiration_secondes=ARTIFACT_TTL_SECONDS)
         
         # Suit aussi toutes les itérations, en évitant les doublons d'itération
         iterations_cle = f"reecriture:{id_document}:iterations"

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
-
+from pydantic import BaseModel, Field
+from typing import List, Optional
+import uuid
 from .agent_reecriture import AgentReecriture
 from .rewrite_schema import (
     EntreeReecriture,
@@ -19,9 +19,9 @@ class RewriteRequest(BaseModel):
     texte_brouillon: str
     critiques: List[dict]
     ids_sources_existantes: List[str] = []
-    contexte: str = None
+    contexte: Optional[str] = None
     iteration: int = 1
-    id_document: str = "default"
+    id_document: str = Field(default_factory=lambda: str(uuid.uuid4()))
 
     class Config:
         schema_extra = {
