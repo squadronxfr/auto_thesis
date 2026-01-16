@@ -237,8 +237,8 @@ Search and save."""
             return False
     
     def test_force_all_tools(self):
-        """Test 7: Generate complete thesis"""
-        self._print_header("7. Generate Complete Thesis")
+        """Test 7: Generate complete thesis in 3 parts"""
+        self._print_header("7. Generate Complete Thesis (3 Parts)")
         
         self._print_info("Step 1: Reading methodology PDF")
         methodology = self.mcp_call("read_pdf", {
@@ -249,10 +249,10 @@ Search and save."""
             self._print_error("Failed to read methodology")
             return False
         
-        method_text = methodology.get('result', {}).get('text', '') # [:2000] Limit pcq trop long flemme
+        method_text = methodology.get('result', {}).get('text', '')
         self._print_info(f"Methodology loaded ({len(method_text)} chars)")
         
-        self._print_info("Step 2: Searching web for content")
+        self._print_info("Step 2: Searching web for content (ONE TIME)")
         web_content = self.mcp_call("fetch_url_content", {
             "search_query": "artificial intelligence healthcare applications 2024",
             "max_results": 5,
@@ -276,23 +276,16 @@ Search and save."""
                 web_text = ""
                 web_results = []
             else:
-                sources_list = []
                 web_text_parts = ["AVAILABLE SOURCES:"]
                 
                 for i, r in enumerate(results, 1):
                     title = r.get('title', f'Source {i}')
                     url = r.get('url', '')
-                    content_snippet = r.get('content', '')[:300]
-                    
-                    sources_list.append({
-                        'number': i,
-                        'title': title,
-                        'url': url
-                    })
+                    content = r.get('content', '')
                     
                     web_text_parts.append(f"\n[{i}] Title: {title}")
                     web_text_parts.append(f"URL: {url}")
-                    web_text_parts.append(f"Snippet: {content_snippet[:200]}...")
+                    web_text_parts.append(f"Content: {content}")
                 
                 web_text = "\n".join(web_text_parts)
                 web_results = results
@@ -309,9 +302,7 @@ Search and save."""
             self._print_info("Configure SEARXNG_URL or BRAVE_API_KEY in .env")
             return False
         
-        self._print_info("Step 3: Generating thesis with Gemini")
-        
-        # Varied thesis topics to avoid repetition
+        # Thesis topic
         topics = [
             "Artificial Intelligence in Healthcare: Current Applications and Challenges",
             "Machine Learning Approaches to Medical Diagnosis and Treatment",
@@ -322,77 +313,235 @@ Search and save."""
         import random
         selected_topic = random.choice(topics)
         
-        prompt = f"""You are writing CHAPTER 1 of a master's thesis.
+        self._print_info(f"Topic: {selected_topic}")
+        self._print_info("Step 3: Generating PART 1 (Introduction)")
+        
+        # PART 1
+        part1_prompt = f"""You are writing the INTRODUCTION of a master's thesis.
 
 RESEARCH SOURCES YOU MUST CITE:
 {web_text}
 
 TOPIC: {selected_topic}
 
-CRITICAL REQUIREMENTS:
-1. Start with: # Chapter 1: {selected_topic}
+REQUIREMENTS FOR PART 1 - INTRODUCTION:
+1. Start with: # Introduction: {selected_topic}
 2. Use proper Markdown headers: ## for sections, ### for subsections
-3. Minimum 2000 words
-4. CITE SOURCES USING NUMBERS: [1], [2], [3], etc. matching the source list above
-5. Example: "AI improves diagnostic accuracy by 15% [2], according to recent research [4]."
-6. Must include at least 12 citations from the numbered sources
-7. Distribute citations throughout all sections
+3. Target: 2000-2500 words
+4. CITE SOURCES USING NUMBERS: [1], [2], [3], etc.
+5. Must include at least 8 citations from numbered sources
+6. Distribute citations throughout
 
 STRUCTURE (use exactly these headers):
-## 1.1 Introduction and Context (400 words)
-## 1.2 Theoretical Foundations (500 words)  
-## 1.3 Literature Review (700 words) - with many citations [1], [2], etc.
-## 1.4 Current State of Research (300 words) - with citations
-## 1.5 Problem Statement and Objectives (100 words)
+## Introduction Overview
+Explain the thesis scope and relevance
 
-## References
-List all sources using format: [1] Title, URL
+## Context and Background
+Provide historical context
+
+## Problem Statement  
+Define the main problem addressed
+
+## Research Objectives
+State clear objectives
+
+## Thesis Structure
+Brief overview of what follows
 
 Write in academic style, comprehensive and detailed.
-USE NUMBERED CITATIONS [1], [2], [3] etc. NOT placeholder text."""
+DO NOT include references section yet.
+USE NUMBERED CITATIONS [1], [2], [3] etc."""
         
         try:
             response = self.client.models.generate_content(
                 model="gemini-2.0-flash",
-                contents=prompt
+                contents=part1_prompt
             )
-            thesis_content = response.text
+            part1_content = response.text
+            self._print_info(f"Part 1 generated ({len(part1_content)} chars)")
             
-            self._print_info(f"Topic: {selected_topic}")
-            self._print_info(f"Thesis generated ({len(thesis_content)} chars)")
-            
-            self._print_info("Step 4: Saving thesis as PDF")
-            pdf_result = self.mcp_call("generate_pdf", {
-                "file_path": "test/complete_thesis.pdf",
-                "content": thesis_content,
-                "title": f"Master Thesis: {selected_topic}"
-            })
-            
-            # Save metadata
-            metadata = {
-                "generated_at": datetime.now().isoformat(),
-                "methodology_source": "methodologie.pdf",
-                "web_sources_count": len(web_results),
-                "thesis_length": len(thesis_content),
-                "thesis_words": len(thesis_content.split()),
-                "pdf_format": pdf_result.get('result', {}).get('format', 'unknown'),
-                "pdf_size": pdf_result.get('result', {}).get('size', 0)
-            }
+            # Append Part 1 to markdown
             self.mcp_call("append_to_file", {
-                "file_path": "test/thesis_metadata.json",
-                "content": json.dumps(metadata, indent=2, ensure_ascii=False)
+                "file_path": "test/thesis.md",
+                "content": part1_content + "\n\n"
             })
             
-            if pdf_result.get('success'):
-                self._print_success("Complete thesis generated as PDF!")
-                self._print_info(f"Check data/test/ for all results")
-                return True
-            else:
-                self._print_error("Failed to save thesis as PDF")
-                return False
-                
         except Exception as e:
-            self._print_error(f"Generation failed: {str(e)[:50]}")
+            self._print_error(f"Part 1 generation failed: {str(e)[:50]}")
+            return False
+        
+        # Create summary of Part 1 for context
+        part1_summary = part1_content[:1000] + "..." if len(part1_content) > 1000 else part1_content
+        
+        self._print_info("Step 4: Generating PART 2 (Body/Chapters)")
+        
+        # PART 2
+        part2_prompt = f"""You are writing the BODY/MAIN CHAPTERS of a master's thesis.
+
+RESEARCH SOURCES YOU MUST CITE:
+{web_text}
+
+TOPIC: {selected_topic}
+
+PREVIOUS PART SUMMARY (for continuity):
+{part1_summary}
+
+REQUIREMENTS FOR PART 2 - BODY:
+1. Start with: # Body: Main Chapters
+2. Use proper Markdown headers: ## for chapters, ### for sections
+3. Target: 2500-3000 words
+4. CITE SOURCES USING NUMBERS: [1], [2], [3], etc. (same as before)
+5. Must include at least 10 citations from numbered sources
+6. Expand on the problem statement with detailed analysis
+7. Distribute citations throughout
+
+STRUCTURE (use exactly these headers):
+## Chapter 1: Literature Review
+Review existing research and key findings
+
+## Chapter 2: Methodology and Analysis
+Discuss methodological approaches
+
+## Chapter 3: Current Implementations
+Analyze real-world implementations
+
+## Chapter 4: Challenges and Solutions
+Discuss challenges and potential solutions
+
+Write in academic style, comprehensive and detailed.
+DO NOT include references section yet.
+USE NUMBERED CITATIONS [1], [2], [3] etc.
+Ensure continuity with the introduction."""
+        
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=part2_prompt
+            )
+            part2_content = response.text
+            self._print_info(f"Part 2 generated ({len(part2_content)} chars)")
+            
+            # Append Part 2 to markdown
+            self.mcp_call("append_to_file", {
+                "file_path": "test/thesis.md",
+                "content": part2_content + "\n\n"
+            })
+            
+        except Exception as e:
+            self._print_error(f"Part 2 generation failed: {str(e)[:50]}")
+            return False
+        
+        # Create summary of Part 2 for context
+        part2_summary = part2_content[:1000] + "..." if len(part2_content) > 1000 else part2_content
+        
+        self._print_info("Step 5: Generating PART 3 (Conclusion + References)")
+        
+        # PART 3
+        part3_prompt = f"""You are writing the CONCLUSION of a master's thesis.
+
+RESEARCH SOURCES YOU MUST CITE:
+{web_text}
+
+TOPIC: {selected_topic}
+
+PREVIOUS PARTS SUMMARY (for continuity):
+Introduction: {part1_summary}
+
+Main Body: {part2_summary}
+
+REQUIREMENTS FOR PART 3 - CONCLUSION:
+1. Start with: # Conclusion
+2. Use proper Markdown headers: ## for sections
+3. Target: 1500-2000 words
+4. CITE SOURCES USING NUMBERS: [1], [2], [3], etc. (same as before)
+5. Must include at least 5 citations
+6. Summarize key findings and synthesis
+
+STRUCTURE (use exactly these headers):
+## Summary of Key Findings
+Recap main points from body
+
+## Implications and Impact
+Discuss broader implications
+
+## Future Research Directions
+Suggest areas for future work
+
+## Final Conclusions
+Conclude the thesis
+
+## References
+List all {len(web_results)} sources using format:
+[1] Title, URL
+[2] Title, URL
+etc.
+
+Write in academic style, comprehensive and detailed.
+USE NUMBERED CITATIONS [1], [2], [3] etc.
+Ensure the references section is complete and accurate."""
+        
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=part3_prompt
+            )
+            part3_content = response.text
+            self._print_info(f"Part 3 generated ({len(part3_content)} chars)")
+            
+            # Append Part 3 to markdown
+            self.mcp_call("append_to_file", {
+                "file_path": "test/thesis.md",
+                "content": part3_content
+            })
+            
+        except Exception as e:
+            self._print_error(f"Part 3 generation failed: {str(e)[:50]}")
+            return False
+        
+        # Read the complete markdown
+        self._print_info("Step 6: Converting complete thesis to PDF")
+        thesis_path = Path("data/test/thesis.md")
+        if not thesis_path.exists():
+            self._print_error("Thesis markdown not found")
+            return False
+        
+        with open(thesis_path, 'r', encoding='utf-8') as f:
+            complete_thesis = f.read()
+        
+        # Convert to PDF
+        pdf_result = self.mcp_call("generate_pdf", {
+            "file_path": "test/complete_thesis.pdf",
+            "content": complete_thesis,
+            "title": f"Master Thesis: {selected_topic}"
+        })
+        
+        # Save metadata
+        total_chars = len(part1_content) + len(part2_content) + len(part3_content)
+        metadata = {
+            "generated_at": datetime.now().isoformat(),
+            "methodology_source": "methodologie.pdf",
+            "web_sources_count": len(web_results),
+            "thesis_parts": 3,
+            "part1_chars": len(part1_content),
+            "part2_chars": len(part2_content),
+            "part3_chars": len(part3_content),
+            "total_chars": total_chars,
+            "total_words": len(complete_thesis.split()),
+            "pdf_format": pdf_result.get('result', {}).get('format', 'unknown'),
+            "pdf_size": pdf_result.get('result', {}).get('size', 0)
+        }
+        self.mcp_call("append_to_file", {
+            "file_path": "test/thesis_metadata.json",
+            "content": json.dumps(metadata, indent=2, ensure_ascii=False)
+        })
+        
+        if pdf_result.get('success'):
+            self._print_success("Complete thesis generated as PDF!")
+            self._print_info(f"Total content: {total_chars} chars, {len(complete_thesis.split())} words")
+            self._print_info(f"Check data/test/ for all results")
+            return True
+        else:
+            self._print_error("Failed to save thesis as PDF")
             return False
     
     def _parse_and_execute_tools(self, response_text):
