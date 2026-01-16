@@ -19,25 +19,25 @@ export const useRegister = () => {
 
     return useMutation({
         mutationFn: async (userData: RegisterDto) => {
-            const response = await authService.registerUser(userData);
-            if (response.accessToken && response.refreshToken) {
-                login(response.accessToken, response.refreshToken);
+            const response = await authService.registerUser({"first_name":userData.firstName,"last_name":userData.lastName,"email":userData.email,"password":userData.password});
+            if (response.token) {
+                login(response.token);
 
                 // Récupérer les informations de l'utilisateur
-                const user = await authService.getUserByToken(response.accessToken);
+                const user = await authService.getUserByToken(response.token);
                 if (user) {
                     setUser(user.data);
                     // Add user to cache
                     queryClient.setQueryData(['user'], user.data);
                 }
 
-                return { accessToken: response.accessToken, refreshToken: response.refreshToken };
+                return { token: response.token };
             }
             throw new Error('Registration failed');
         },
 
         onSuccess: async (response: AuthResponse) => {
-            login(response.accessToken, response.refreshToken);
+            login(response.token);
         },
     });
 };
@@ -50,31 +50,31 @@ export const useLogin = () => {
     const { login, setUser } = useAuthStore();
 
     return useMutation<
-        { accessToken: string; refreshToken: string },
+        { token: string },
         Error,
         { email: string; password: string; rememberMe: boolean }
     >({
         mutationFn: async ({ email, password, rememberMe }: LoginDto) => {
             const response = await authService.loginUser({ email, password, rememberMe });
-            if (response.accessToken && response.refreshToken) {
+            if (response.token) {
                 // Mettre à jour le store avec les tokens
-                login(response.accessToken, response.refreshToken);
+                login(response.token);
 
                 // Récupérer les informations de l'utilisateur
-                const user = await authService.getUserByToken(response.accessToken);
+                const user = await authService.getUserByToken(response.token);
                 if (user) {
                     setUser(user.data);
                     // Add user to cache
                     queryClient.setQueryData(['user'], user.data);
                 }
 
-                return { accessToken: response.accessToken, refreshToken: response.refreshToken };
+                return { token: response.token };
             }
             throw new Error('Login failed');
         },
 
         onSuccess: async (response: AuthResponse) => {
-            login(response.accessToken, response.refreshToken);
+            login(response.token);
         },
     });
 };
@@ -90,35 +90,17 @@ export const useAutoLogin = () => {
         queryKey: ['autoLogin'],
         queryFn: async () => {
             const accessToken = Cookies.get('accessToken');
-            const refreshToken = Cookies.get('refreshToken');
 
-            if (accessToken && refreshToken) {
+            if (accessToken) {
                 try {
                     const response = await authService.getUserByToken(accessToken);
-                    login(accessToken, refreshToken);
+                    login(accessToken);
                     setUser(response?.data || null);
                     setIsAuthenticated(true);
                     return true;
                 } catch {
-                    if (refreshToken) {
-                        try {
-                            const newTokens = await authService.refreshToken(refreshToken);
-                            if (!newTokens) {
-                                throw new Error('Failed to refresh tokens');
-                            }
-
-                            const userData = await authService.getUserByToken(
-                                newTokens.accessToken
-                            );
-                            login(newTokens.accessToken, newTokens.refreshToken);
-                            setUser(userData?.data || null);
-                            setIsAuthenticated(true);
-                            return true;
-                        } catch {
-                            console.error('Failed to refresh token, user needs to log in again.');
-                            handleLogout();
-                        }
-                    }
+                    console.error('Failed to refresh token, user needs to log in again.');
+                    handleLogout()
                 }
             } else {
                 handleLogout();
