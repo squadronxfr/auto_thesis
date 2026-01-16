@@ -92,7 +92,7 @@ class AgentReecriture(BaseAgent):
         texte_nettoye = texte
         for id_citation in ids_inventes:
             texte_nettoye = texte_nettoye.replace(id_citation, '')
-            texte_nettoye = re.sub(r'\s+', ' ', texte_nettoye)
+        texte_nettoye = re.sub(r'\s+', ' ', texte_nettoye)
         return texte_nettoye.strip()
     
     def _construire_prompt(
