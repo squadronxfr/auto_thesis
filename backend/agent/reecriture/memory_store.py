@@ -122,8 +122,11 @@ class StockageMemoire:
         cle = f"reecriture:{id_document}:iteration:{iteration}"
         self.definir(cle, artefact, expiration_secondes=86400)  # Expiration 24h
         
-        # Suit aussi toutes les itérations
-        self.ajouter_a_liste(f"reecriture:{id_document}:iterations", iteration)
+        # Suit aussi toutes les itérations, en évitant les doublons d'itération
+        iterations_cle = f"reecriture:{id_document}:iterations"
+        iterations_existantes = self.obtenir_liste(iterations_cle)
+        if iteration not in iterations_existantes:
+            self.ajouter_a_liste(iterations_cle, iteration)
     
     def obtenir_historique_reecriture(self, id_document: str) -> list:
         """Obtient toutes les itérations de réécriture pour un document."""
