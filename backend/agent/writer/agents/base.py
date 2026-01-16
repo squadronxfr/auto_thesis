@@ -4,9 +4,6 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from backend.config.settings import settings
 
-
-
-
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
 # Modèle de configuration pour un agent
