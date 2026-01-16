@@ -29,10 +29,21 @@ echo "📌 Compose: ${BASE_COMPOSE}"
 [[ -f "${PROD_COMPOSE}" ]] && echo "📌 Prod override: ${PROD_COMPOSE}"
 ## echo "📌 Agents replicas: ${AGENTS_REPLICAS}"
 
-# Déploiement
+# Déploiement avec arrêt propre pour mise à jour
+echo "🔄 Arrêt des conteneurs existants..."
+"${DC[@]}" down
+
+echo "📦 Pull des images..."
 "${DC[@]}" pull
+
+echo "🔨 Build des images..."
 "${DC[@]}" build --pull
+
+echo "🚀 Démarrage des services..."
 "${DC[@]}" up -d --remove-orphans
+
+echo "🧹 Nettoyage des anciennes images..."
+docker image prune -f
 
 echo "✅ Deploy OK"
 "${REPO_ROOT}/devops/scripts/status.sh"

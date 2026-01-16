@@ -22,8 +22,18 @@ fi
 
 echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 
-docker compose --env-file devops/.env -f devops/compose/compose.prod.yml pull
-docker compose --env-file devops/.env -f devops/compose/compose.prod.yml up -d --remove-orphans
+# Arrêter les conteneurs existants pour une mise à jour propre
+echo "🔄 Arrêt des conteneurs existants..."
+docker compose --env-file devops/.env.example -f devops/compose/compose.prod.yml down
+
+# Pull des nouvelles images
+echo "📦 Téléchargement des nouvelles images..."
+docker compose --env-file devops/.env.example -f devops/compose/compose.prod.yml pull
+
+# Démarrage des services
+echo "🚀 Démarrage des services..."
+docker compose --env-file devops/.env.example -f devops/compose/compose.prod.yml up -d --remove-orphans
+
 
 echo "✅ Install/Deploy terminé"
-docker compose --env-file devops/.env -f devops/compose/compose.prod.yml ps
+docker compose --env-file devops/.env.example -f devops/compose/compose.prod.yml ps
