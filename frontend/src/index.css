@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 100vh;
+}
+
+@layer base {
+    :root {
+        --radius: 0.5rem;
+        
+        /* Dark Theme Variables */
+        --bg-primary: #172B49;
+        --bg-secondary: #1a1f2e;
+        --bg-card: rgba(26, 31, 46, 0.4);
+        --bg-card-hover: rgba(26, 31, 46, 0.6);
+        
+        --border-subtle: rgba(255, 255, 255, 0.08);
+        --border-medium: rgba(255, 255, 255, 0.12);
+        
+        --text-primary: rgba(255, 255, 255, 0.95);
+        --text-secondary: rgba(255, 255, 255, 0.65);
+        --text-tertiary: rgba(255, 255, 255, 0.4);
+        
+        --accent-blue: #126FFF;
+        --accent-blue-hover: #0f5dd9;
+    }
+}
+
+@layer utilities {
+    .glass-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(24px);
+        border: 1px solid var(--border-subtle);
+    }
+    
+    .glass-card-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .glass-card-hover:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--border-medium);
+    }
+    
+    .animate-gradient {
+        background-size: 200% auto;
+        animation: gradient 3s ease infinite;
+    }
+    
+    @keyframes gradient {
+        0%, 100% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+}
+
+/* Custom Cursor Effect */
+@layer base {
+  body {
+    cursor: none !important;
+  }
+  
+  a, button, [role="button"], input, textarea, select {
+    cursor: none !important;
+  }
+}
+
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: #126FFF;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: 0 0 10px #126FFF, 0 0 20px rgba(18, 111, 255, 0.4);
+  transform: translate(-50%, -50%);
+  transition: width 0.2s ease-in-out, height 0.2s ease-in-out, opacity 0.3s ease;
+}
+
+.cursor-outline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(18, 111, 255, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease-out, width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+  box-shadow: inset 0 0 8px rgba(18, 111, 255, 0.2), 0 0 12px rgba(18, 111, 255, 0.1);
+}
+
+body.cursor-active .cursor-dot {
+  width: 12px;
+  height: 12px;
+  opacity: 0.8;
+  box-shadow: 0 0 15px #126FFF, 0 0 30px #126FFF;
+}
+
+body.cursor-active .cursor-outline {
+  width: 48px;
+  height: 48px;
+  border-color: #126FFF;
+  background: rgba(18, 111, 255, 0.1);
+  animation: cursor-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes cursor-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(18, 111, 255, 0.4);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(18, 111, 255, 0);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(18, 111, 255, 0);
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
