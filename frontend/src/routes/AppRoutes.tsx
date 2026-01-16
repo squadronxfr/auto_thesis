@@ -61,8 +61,6 @@ export function AppRoutes() {
                         <Route element={<PrivateRoutes />}>
                             <Route path="/app" element={<Navigate to="/profile" replace />} />
                             <Route path="/dashboard" element={<DashboardCustomer />} />
-                            <Route path="/profile" element={<Profile />} />
-                            <Route path="/users" element={<Users />} />
                         </Route>
 
                         {/* Routes d'erreur */}

@@ -1,140 +1,52 @@
-# React TSX Template
+# Auto Thesis - Frontend
 
-Ce projet est un template de démarrage pour une application React utilisant TypeScript, configurée avec Vite pour un développement rapide et TailwindCSS pour le style.
+Ce dossier contient le code source de l'interface utilisateur de l'application **Auto Thesis**, une plateforme permettant la génération de mémoires académiques assistée par des agents d'intelligence artificielle.
 
-## Table des matières
+## 🗺️ Pages et Routes
 
-- [Prérequis](#prérequis)
-- [Installation](#installation)
-- [Scripts](#scripts)
-- [Structure du Projet](#structure-du-projet)
-- [Dépendances Principales](#dépendances-principales)
-- [Contribuer](#contribuer)
+Voici le recensement exhaustif des pages, leur contenu et les routes associées définies dans l'application.
 
----
+| Route | Composant | Accès | Description & Contenu |
+|-------|-----------|-------|-----------------------|
+| `/` | `LandingPage` | 🌍 Public | **Page d'accueil.** Présentation du produit, fonctionnalités, indicateurs d'étapes, et liens vers authentification. Utilise des animations Framer Motion. |
+| `/login` | `Login` | 🌍 Public | **Connexion.** Formulaire permettant aux utilisateurs existants de se connecter. Liens vers récupération de mot de passe et inscription. |
+| `/register` | `Register` | 🌍 Public | **Inscription.** Processus de création de compte pour les nouveaux utilisateurs. Formulaire multi-étapes. |
+| `/forgot-password` | `ForgotPassword` | 🌍 Public | **Mot de passe oublié.** Formulaire pour initier la procédure de réinitialisation du mot de passe. |
+| `/dashboard` | `DashboardCustomer` | 🔒 Privé | **Tableau de bord client.** Espace principal pour l'utilisateur. Affiche la liste des mémoires générés, permet la prévisualisation PDF et le téléchargement. (Accessible aussi publiquement temporairement selon configuration routes). |
+| `/app` | - | 🔒 Privé | Redirection automatique vers `/profile`. |
+| `/profile` | `Profile` | 🔒 Privé | **Profil utilisateur.** Affiche les informations de l'utilisateur connecté (Email, Nom, Prénom, Rôles). |
+| `/users` | `Users` | 🔒 Privé | **Gestion des utilisateurs.** (Probablement Admin). Liste des utilisateurs avec recherche, filtres et pagination infinie. |
+| `/error` | `Error` | 🌍 Public | **Page d'erreur.** Affichage générique des erreurs. |
+| `*` | - | - | Redirection vers la page d'accueil `/`. |
 
-## Prérequis
+## 🏗️ Structure des Dossiers Clés
 
-- Node.js version >= 14.x et npm version >= 6.x
+- **`src/features`** : Contient les composants de pages regroupés par fonctionnalité (auth, landing, documents, user, users).
+- **`src/components`** : Composants réutilisables (UI kit, Layouts, etc.).
+- **`src/routes`** : Définition des routes (AppRoutes) et guards (PrivateRoutes, PublicRoutes).
+- **`src/api`** : Services pour les appels API backend.
+- **`src/stores`** : Gestion d'état global (Zustand).
 
-## Installation
+## 🚀 Installation et Démarrage
 
-1. Clonez ce repository :
-  ```bash
-  git clone https://github.com/votre-utilisateur/react-tsx-template.git
-  cd react-tsx-template
-  ```
+### Prérequis
+- Node.js (v18+ recommandé)
+- pnpm (recommandé) ou npm
 
-2. Installez les dépendances :
-  ```bash
-  npm install
-  ```
-
-3. Lancez l'application en mode développement :
-  ```bash
-  npm run dev
-  ```
-
-L'application sera accessible à l'adresse `http://localhost:5173`.
-
-## Scripts
-
-Voici les principaux scripts disponibles :
-
-- `npm run dev` : Démarre le serveur de développement avec Vite
-- `npm run build` : Génère la version de production de l'application
-- `npm run lint` : Linting du code avec ESLint
-- `npm run preview` : Prévisualise l'application de production générée
-
-## Structure du Projet
-
+### Installation des dépendances
 ```bash
-src/
-├── api/                    # Logique API et requêtes
-│   ├── queries/           # Requêtes API
-│   ├── authQueries.ts
-│   ├── authService.ts
-│   └── interceptor.ts
-├── assets/                # Ressources statiques
-├── components/            # Composants réutilisables
-│   ├── layout/           # Composants de mise en page
-│   │   ├── Footer.tsx
-│   │   ├── Header.tsx
-│   │   └── Sidebar.tsx
-│   └── ui/               # Composants d'interface utilisateur
-│       ├── Badge.tsx
-│       ├── Button.tsx
-│       ├── Card.tsx
-│       ├── Input.tsx
-│       ├── Loader.tsx
-│       ├── Modal.tsx
-│       ├── Pagination.tsx
-│       └── Tooltip.tsx
-├── configs/              # Fichiers de configuration
-│   └── queryClient.ts
-├── features/             # Fonctionnalités principales
-│   ├── auth/            # Authentication
-│   │   ├── Login.tsx
-│   │   └── Register.tsx
-│   ├── user/            # Gestion utilisateur
-│   │   └── Profile.tsx
-│   └── Error.tsx
-├── lib/                 # Utilitaires et helpers
-│   └── utils.ts
-├── routes/              # Configuration des routes
-│   ├── AppRoutes.tsx
-│   ├── PrivateRoutes.tsx
-│   └── PublicRoutes.tsx
-├── services/            # Services de l'application
-├── stores/             # Gestion de l'état (Zustand)
-│   ├── authStore.ts
-│   └── userStore.ts
-├── types/              # Types TypeScript
-│   ├── apiType.ts
-│   ├── authType.ts
-│   └── userType.ts
-├── validators/         # Validation des formulaires
-│   ├── loginValidator.ts
-│   └── registerValidator.ts
-├── App.tsx
-├── main.tsx
-└── vite-env.d.ts
+cd frontend
+pnpm install
 ```
 
-## Dépendances Principales
+### Lancer le serveur de développement
+```bash
+pnpm dev
+```
+L'application sera accessible sur `http://localhost:5173` (port par défaut de Vite).
 
-- `React` : Bibliothèque pour créer des interfaces utilisateur
-- `TypeScript` : Superset typé de JavaScript
-- `React Query` : Gestion des requêtes API et du cache
-- `Zustand` : Gestion de l'état global
-- `TailwindCSS` : Framework CSS utilitaire
-- `React Router DOM` : Routage de l'application
-
-## Fonctionnalités
-
-- 🔐 Authentification complète (Login/Register)
-- 🛣️ Système de routage avec routes protégées
-- 🎨 Interface utilisateur responsive avec TailwindCSS
-- 📡 Gestion des requêtes API avec React Query
-- 🔄 Gestion de l'état global avec Zustand
-- ✨ Composants UI réutilisables et animés
-  - Boutons interactifs avec états de chargement
-  - Cartes avec animations
-  - Champs de formulaire avec validation
-  - Badges et tooltips
-  - Pagination
-  - Modales
-- 🛡️ Validation des formulaires avec Zod
-- 📝 Types TypeScript complets
-- 🎭 Animations fluides avec Framer Motion
-
-## Contribuer
-
-Les contributions sont les bienvenues ! Pour toute suggestion d'amélioration, veuillez ouvrir une issue ou une pull request.
-
----
-
-Développez votre application avec ce template et personnalisez-le selon vos besoins pour un démarrage rapide 🚀 !
-
-Ce `README.md` donne aux utilisateurs toutes les informations nécessaires pour démarrer, comprendre la structure, et personnaliser leur projet. 
+### Construction pour la production
+```bash
+pnpm build
+```
 

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import APIRouter, HTTPException, Header, Depends
 from pydantic import BaseModel
 import bcrypt
 import uuid
 from backend.config import settings
+from backend.db.database import get_db
 from jose import jwt, JWTError
 
 user_router = APIRouter()
