@@ -1,0 +1,42 @@
+version: "3.9"
+ 
+services:
+
+  postgres:
+
+    image: postgres:16
+
+    container_name: postgres-docker
+
+    environment:
+
+      POSTGRES_USER: ${POSTGRES_USER}
+
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+
+      - "40003:40003"
+
+    volumes:
+
+      - postgres_data:/var/lib/postgresql/data
+
+      - ./init-db:/docker-entrypoint-initdb.d
+ 
+  redis:
+
+    image: redis:7
+
+    container_name: redis-docker
+
+    ports:
+
+      - "6379:6379"
+ 
+volumes:
+
+  postgres_data:
+ 
