@@ -18,7 +18,7 @@ services:
 
     ports:
 
-      - "5432:5432"
+      - "40003:5432"
 
     volumes:
 

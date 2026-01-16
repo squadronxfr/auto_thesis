@@ -2,16 +2,19 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight, Layers } from "lucide-react";
 import { useLocation } from "react-router-dom";
+import { useAuthStore } from "@/stores/authStore";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { isAuthenticated } = useAuthStore();
   const isLandingPage = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
+    console.log(isAuthenticated)
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -67,12 +70,21 @@ export const Navbar = () => {
 
           {/* Right Action */}
           <div className="hidden md:flex items-center gap-4">
-            <button 
+            {!isAuthenticated ?
+              <button 
               onClick={() => window.location.href = '/login'}
               className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
             >
               Connexion
-            </button>
+              </button>
+              :
+              <button 
+              onClick={() => window.location.href = '/upload'}
+                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+              >
+                Upload
+              </button>
+            }
             <button 
               onClick={() => window.location.href = '/register'}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#126FFF] hover:bg-[#126FFF]/90 text-sm font-semibold text-white transition-all shadow-lg shadow-[#126FFF]/20"
