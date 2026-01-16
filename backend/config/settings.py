@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     DATABASE_USER: str = "samuel"
     DATABASE_PASSWORD: str = "samuel123"
     SSL: bool = False
+    MCP_URL: str
 
     @property
     def allowed_hosts_list(self) -> List[str]:
