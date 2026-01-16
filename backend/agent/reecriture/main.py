@@ -1,13 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
-import sys
-import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from reecriture.agent_reecriture import AgentReecriture
-from reecriture.rewrite_schema import (
+from .agent_reecriture import AgentReecriture
+from .rewrite_schema import (
     EntreeReecriture,
     SortieReecriture,
     CritiqueJuge
