@@ -1,7 +1,6 @@
- 
 -- USERS
  
-CREATE TABLE users (
+CREATE TABLE USERS (
     id BIGSERIAL PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
@@ -11,84 +10,76 @@ CREATE TABLE users (
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
     updated_at  TIMESTAMP NOT NULL DEFAULT now()
 );
-
+ 
  
 -- TOKENS
  
-CREATE TABLE token (
+CREATE TABLE TOKEN (
     id BIGSERIAL PRIMARY KEY,
     token_string TEXT NOT NULL UNIQUE,
     user_id BIGINT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
-
     CONSTRAINT fk_token_user
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
 );
-
+ 
  
 -- REQUESTS (user requests)
  
-CREATE TABLE request (
+CREATE TABLE REQUEST (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     status TEXT NOT NULL CHECK (status IN ('IN_PROGRESS', 'COMPLETED')),
     user_id BIGINT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
-
     CONSTRAINT fk_request_user
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
 );
-
+ 
  
 -- ACTIVITY
  
-CREATE TABLE activity (
+CREATE TABLE ACTIVITY (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     request_id BIGINT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
-
     CONSTRAINT fk_activity_request
-        FOREIGN KEY (request_id) REFERENCES request(id) ON DELETE CASCADE
+        FOREIGN KEY (request_id) REFERENCES REQUEST(id) ON DELETE CASCADE
 );
-
+ 
  
 -- DOCUMENTS
--- (sent document / final document)
  
-CREATE TABLE document (
+CREATE TABLE DOCUMENT (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     document_type TEXT NOT NULL CHECK (document_type IN ('SOURCE', 'FINAL')),
     request_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
-
     CONSTRAINT fk_document_request
-        FOREIGN KEY (request_id) REFERENCES request(id) ON DELETE CASCADE,
-
+        FOREIGN KEY (request_id) REFERENCES REQUEST(id) ON DELETE CASCADE,
     CONSTRAINT fk_document_user
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
 );
-
+ 
  
 -- REQUEST STEPS
  
-CREATE TABLE request_step (
+CREATE TABLE REQUEST_STEP (
     id BIGSERIAL PRIMARY KEY,
     request_id BIGINT NOT NULL,
     order_index INTEGER NOT NULL,
     token_cost INTEGER NOT NULL,
     content TEXT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
-
     CONSTRAINT fk_request_step_request
-        FOREIGN KEY (request_id) REFERENCES request(id) ON DELETE CASCADE,
-
+        FOREIGN KEY (request_id) REFERENCES REQUEST(id) ON DELETE CASCADE,
     CONSTRAINT uq_request_step_order
         UNIQUE (request_id, order_index)
 );
-
+ 
  
 -- SOURCE
  
@@ -100,17 +91,17 @@ CREATE TABLE SOURCE (
     link TEXT NOT NULL,
     date DATE,
     CONSTRAINT fk_source_document
-        FOREIGN KEY (document_id) REFERENCES document(id) ON DELETE CASCADE
+        FOREIGN KEY (document_id) REFERENCES DOCUMENT(id) ON DELETE CASCADE
 );
-
-
+ 
  
 -- INDEXES (performance)
  
-CREATE INDEX idx_token_user_id ON token(user_id);
-CREATE INDEX idx_request_user_id ON request(user_id);
-CREATE INDEX idx_activity_request_id ON activity(request_id);
-CREATE INDEX idx_document_request_id ON document(request_id);
-CREATE INDEX idx_document_user_id ON document(user_id);
-CREATE INDEX idx_request_step_request_id ON request_step(request_id);
-CREATE INDEX idx_source_document_id ON source(document_id);
+CREATE INDEX idx_token_user_id ON TOKEN(user_id);
+CREATE INDEX idx_request_user_id ON REQUEST(user_id);
+CREATE INDEX idx_activity_request_id ON ACTIVITY(request_id);
+CREATE INDEX idx_document_request_id ON DOCUMENT(request_id);
+CREATE INDEX idx_document_user_id ON DOCUMENT(user_id);
+CREATE INDEX idx_request_step_request_id ON REQUEST_STEP(request_id);
+CREATE INDEX idx_source_document_id ON SOURCE(document_id);
+ 

@@ -10,6 +10,8 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
       - ../../DB/init-db:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "${POSTGRES_HOST_PORT:-40003}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -24,13 +26,13 @@ services:
     restart: unless-stopped
     volumes:
       - redis_data:/data
+    ports:
+      - "${REDIS_HOST_PORT:-40010}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
       retries: 20
-    ports:
-      - "40010:40010"
     networks:
       - app-network
 
