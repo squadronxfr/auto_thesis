@@ -15,7 +15,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Instance unique de l'agent, créée au démarrage de l'application
 agent = AgentReecriture()
 
 class RewriteRequest(BaseModel):

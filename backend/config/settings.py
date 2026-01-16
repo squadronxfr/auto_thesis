@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     DATABASE_USER: str = "admin"
     DATABASE_PASSWORD: str = "admin"
     SSL: bool = False
+    GEMINI_MODEL_NAME: str
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_PASSWORD: str = ""
 
     @property
     def allowed_hosts_list(self) -> List[str]:
