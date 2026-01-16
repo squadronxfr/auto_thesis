@@ -157,7 +157,6 @@ Réécris le texte pour traiter TOUTES les critiques ci-dessus.
             )
             return sortie
         
-        citations_originales = self._extraire_ids_citations(donnees_entree.texte_brouillon)
         citations_valides = set(donnees_entree.ids_sources_existantes)
         prompt = self._construire_prompt(donnees_entree)
         
