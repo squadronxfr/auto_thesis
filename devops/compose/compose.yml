@@ -4,7 +4,7 @@ services:
       context: ../../DB
       dockerfile: Dockerfile
     image: auto_thesis-postgres:16
-    container_name: ${COMPOSE_PROJECT_NAME:-auto_thesis}_postgres
+    container_name: auto_thesis_postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-app}
       POSTGRES_USER: ${POSTGRES_USER:-app}
@@ -19,7 +19,7 @@ services:
 
   redis:
     image: redis:7
-    container_name: ${COMPOSE_PROJECT_NAME:-auto_thesis}_redis
+    container_name: auto_thesis_redis
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redis_data:/data
@@ -95,9 +95,9 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL}
-    container_name: ${COMPOSE_PROJECT_NAME:-auto_thesis}_frontend
+    container_name: auto_thesis_frontend
     ports:
-      - "${FRONTEND_HOST_PORT:-3000}:3000"
+      - "${FRONTEND_HOST_PORT:-40000}:80"
     # depends_on:
     #   backend:
     #     condition: service_healthy
