@@ -10,7 +10,7 @@ load_dotenv()
 # Configuration de Gemini
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
-    print("ATTENTION: Pas de clé GEMINI_API_KEY trouvée dans le fichier .env")
+    raise ValueError("La variable d'environnement GEMINI_API_KEY n'est pas définie.")
 
 genai.configure(api_key=api_key)
 
