@@ -132,7 +132,7 @@ Réécris le texte pour traiter TOUTES les critiques ci-dessus.
         self, 
         donnees_entree: EntreeReecriture, 
         iteration: int = 1,
-        id_document: str = "defaut"
+        id_document: str = "default"
     ) -> SortieReecriture:
         """
         Méthode principale de réécriture.
