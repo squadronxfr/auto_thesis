@@ -88,10 +88,10 @@ class StockageMemoire:
             try:
                 self.client_redis.delete(cle)
             except Exception as e:
-                # Redis deletion failed, continue with local deletion anyway
+                # Redis deletion failed, continuing with local deletion
                 print(f"Erreur Redis DELETE: {e}, poursuite avec suppression locale")
         
-        # Always attempt local deletion (fallback or primary storage)
+        # Always perform local deletion (acts as fallback when Redis fails or primary storage when Redis unavailable)
         self.memoire_locale.pop(cle, None)
     
     def ajouter_a_liste(self, cle: str, valeur: Any):
