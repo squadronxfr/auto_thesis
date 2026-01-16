@@ -8,6 +8,9 @@ from pathlib import Path
 env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
+# Constants
+ARTIFACT_TTL_SECONDS = 86400  # 24 hours in seconds
+
 class StockageMemoire:
     """
     Stockage mémoire basé sur Redis avec repli en mémoire.
@@ -120,7 +123,7 @@ class StockageMemoire:
     ):
         """Stocke un artefact de réécriture pour un document et itération spécifiques."""
         cle = f"reecriture:{id_document}:iteration:{iteration}"
-        self.definir(cle, artefact, expiration_secondes=86400)  # Expiration 24h
+        self.definir(cle, artefact, expiration_secondes=ARTIFACT_TTL_SECONDS)
         
         # Suit aussi toutes les itérations
         self.ajouter_a_liste(f"reecriture:{id_document}:iterations", iteration)
