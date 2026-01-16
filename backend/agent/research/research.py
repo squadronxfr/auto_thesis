@@ -5,7 +5,7 @@ from backend.agent.artifact.base import AgentConfig
 from backend.agent.mcp_client import MCPClient
 from .research_schema import ResearchResult, Source
 from typing import List, Dict
-
+from backend.config.settings import settings
 
 class ResearchAgent:
     def __init__(self):
@@ -23,7 +23,7 @@ class ResearchAgent:
             - Extrait un résumé pertinent de chaque source
             - Identifie les mots-clés importants
             """,
-            model_name="gemini-2.5-flash",
+            model_name=settings.GEMINI_MODEL_NAME,
             temperature=0.3
         )
 

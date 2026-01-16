@@ -1,12 +1,11 @@
 import httpx
 from typing import List, Dict, Any, Optional
-from pydantic import BaseModel
 from backend.config.settings import settings
 
 class MCPClient:
     def __init__(self, base_url: str = settings.MCP_URL):
         self.base_url = base_url
-        self.client = httpx.AsyncClient(timeout=30.0)
+        self.client = httpx.AsyncClient(timeout=600.0)  #10 minutes timeout
 
     async def health_check(self) -> bool:
         try:

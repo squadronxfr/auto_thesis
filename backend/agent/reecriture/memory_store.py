@@ -2,12 +2,8 @@ import os
 import json
 import logging
 from typing import Optional, Dict, Any
-from dotenv import load_dotenv
-from pathlib import Path
+from backend.config.settings import settings
 logger = logging.getLogger(__name__)
-# Load .env from backend directory (2 levels up from this file)
-env_path = Path(__file__).parent.parent.parent / '.env'
-load_dotenv(dotenv_path=env_path)
 ARTIFACT_TTL_SECONDS = 86400
 class StockageMemoire:
     """
@@ -24,10 +20,10 @@ class StockageMemoire:
         """Initialise la connexion Redis avec repli vers dict local."""
         try:
             import redis
-            hote_redis = os.getenv("REDIS_HOST", "localhost")
-            port_redis = int(os.getenv("REDIS_PORT", "6379"))
-            bd_redis = int(os.getenv("REDIS_DB", "0"))
-            mdp_redis = os.getenv("REDIS_PASSWORD", None)
+            hote_redis = settings.REDIS_HOST
+            port_redis = settings.REDIS_PORT
+            bd_redis = settings.REDIS_DB
+            mdp_redis = settings.REDIS_PASSWORD
             
             self.client_redis = redis.Redis(
                 host=hote_redis,
@@ -37,11 +33,10 @@ class StockageMemoire:
                 decode_responses=True,
                 socket_connect_timeout=2
             )
-            # Test de connexion
             self.client_redis.ping()
-            logger.info("✓ Redis connecté avec succès")
+            logger.info("Redis connecté avec succès")
         except Exception as e:
-            logger.warning(f"⚠ Redis indisponible ({e}), utilisation de la mémoire locale")
+            logger.warning(f"Redis indisponible ({e}), utilisation de la mémoire locale")
             self.client_redis = None
     
     def definir(self, cle: str, valeur: Any, expiration_secondes: Optional[int] = None):
@@ -57,7 +52,6 @@ class StockageMemoire:
             except Exception as e:
                 logger.error(f"Erreur Redis SET: {e}, utilisation repli local")
         
-        # Repli local
         self.memoire_locale[cle] = serialisee
         return True
     
@@ -77,7 +71,6 @@ class StockageMemoire:
         if valeur is None:
             return None
         
-        # Tente de désérialiser JSON
         try:
             return json.loads(valeur)
         except (json.JSONDecodeError, TypeError):

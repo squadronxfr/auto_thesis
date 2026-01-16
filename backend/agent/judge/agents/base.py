@@ -1,28 +1,17 @@
-import os
 import google.generativeai as genai
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
-from dotenv import load_dotenv
+from backend.config.settings import settings
 
-# Charge les variables d'environnement (la clé API)
-load_dotenv()
+genai.configure(api_key=settings.GEMINI_API_KEY)
 
-# Configuration de Gemini
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    print("ATTENTION: Pas de clé GEMINI_API_KEY trouvée dans le fichier .env")
-
-genai.configure(api_key=api_key)
-
-# Modèle de configuration pour un agent
 class AgentConfig(BaseModel):
     name: str
     role: str
     system_instruction: str
-    model_name: str = "gemini-2.5-flash"
+    model_name: str = settings.GEMINI_MODEL_NAME
     temperature: float = 0.7
 
-# Modèle pour ce que l'utilisateur envoie
 class AgentInput(BaseModel):
     user_input: str  # Le texte à analyser ou la commande
     context: Optional[Dict[str, Any]] = {}
