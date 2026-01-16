@@ -92,28 +92,30 @@ export function DocumentUploadForm({ onSuccess }: DocumentUploadFormProps) {
                 });
             }, 200);
 
-            // Appel API
-            const response = await documentService.generateDocument(uploadData);
-
-            clearInterval(progressInterval);
-            setUploadProgress(100);
-
-            if (response && response.data) {
-                toast.success('Traitement lancé avec succès! Redirection vers le dashboard...');
-                
-                // Réinitialiser le formulaire
-                setFormData({ topic: '', file: null });
-                setUploadProgress(0);
-                
-                // Appeler le callback de succès si fourni
-                if (onSuccess) {
-                    onSuccess();
+            try {
+                // Appel API
+                const response = await documentService.generateDocument(uploadData);
+                clearInterval(progressInterval);
+                setUploadProgress(100);
+                if (response && response.data) {
+                    toast.success('Traitement lancé avec succès! Redirection vers le dashboard...');
+                    
+                    // Réinitialiser le formulaire
+                    setFormData({ topic: '', file: null });
+                    setUploadProgress(0);
+                    
+                    // Appeler le callback de succès si fourni
+                    if (onSuccess) {
+                        onSuccess();
+                    }
+                    // Redirection vers le dashboard avec un délai
+                    setTimeout(() => {
+                        navigate('/dashboard');
+                    }, 1500);
                 }
-
-                // Redirection vers le dashboard avec un délai
-                setTimeout(() => {
-                    navigate('/dashboard');
-                }, 1500);
+            } catch (error) {
+                clearInterval(progressInterval);
+                throw error;
             }
         } catch (error: any) {
             setIsLoading(false);
@@ -138,6 +140,8 @@ export function DocumentUploadForm({ onSuccess }: DocumentUploadFormProps) {
             else {
                 toast.error('Une erreur est survenue lors de l\'upload du document');
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
