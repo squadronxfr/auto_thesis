@@ -52,6 +52,13 @@ app.post('/tools/:toolName', async (req, res) => {
 
   try {
     const result = await tool.execute(params);
+    
+    // Check if the result contains an error field
+    if (result && result.error) {
+      console.error(`Tool ${toolName} returned error: ${result.error}`);
+      return res.json({ success: false, error: result.error, result });
+    }
+    
     console.log(`Tool ${toolName} executed successfully`);
     res.json({ success: true, result });
   } catch (error) {
