@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: auto_thesis-postgres:16
+    image: postgres:16
     container_name: auto_thesis_postgres
     restart: unless-stopped
     environment:
@@ -19,7 +19,7 @@ services:
       - app-network
 
   redis:
-    image: auto_thesis-redis:7
+    image: redis:7
     container_name: auto_thesis_redis
     restart: unless-stopped
     volumes:
