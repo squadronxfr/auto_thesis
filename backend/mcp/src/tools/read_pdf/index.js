@@ -4,17 +4,17 @@ import pdfParse from 'pdf-parse';
 
 export const readPdfTool = {
   name: 'read_pdf',
-  description: 'Read and extract text content from a PDF file. Can read from a file path or from base64 encoded content.',
+  description: 'Lit et extrait le contenu textuel d\'un fichier PDF. Peut lire depuis un chemin de fichier ou depuis un contenu encodé en base64.',
   parameters: {
     type: 'object',
     properties: {
       file_path: {
         type: 'string',
-        description: 'Path to the PDF file to read (relative to data directory)'
+        description: 'Chemin du fichier PDF à lire (relatif au répertoire data)'
       },
       base64_content: {
         type: 'string',
-        description: 'Base64 encoded PDF content (alternative to file_path)'
+        description: 'Contenu PDF encodé en base64 (alternative à file_path)'
       }
     },
     oneOf: [

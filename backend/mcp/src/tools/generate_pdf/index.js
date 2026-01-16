@@ -177,22 +177,22 @@ function markdownToHtml(markdown) {
 
 export const generatePdfTool = {
     name: 'generate_pdf',
-    description: 'Generate a PDF document from Markdown content',
+    description: 'Génère un document PDF à partir de contenu Markdown',
     parameters: {
         file_path: {
             type: 'string',
             required: true,
-            description: 'Path to save the PDF file (relative to data directory)'
+            description: 'Chemin pour sauvegarder le fichier PDF (relatif au répertoire data)'
         },
         content: {
             type: 'string',
             required: true,
-            description: 'Markdown content to convert to PDF'
+            description: 'Contenu Markdown à convertir en PDF'
         },
         title: {
             type: 'string',
             required: false,
-            description: 'Document title'
+            description: 'Titre du document'
         }
     },
     execute: generatePdf
