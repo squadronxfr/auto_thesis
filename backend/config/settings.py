@@ -18,12 +18,14 @@ class Settings(BaseSettings):
     PORT: int
     ALGORITHM: str
     ALLOWED_HOSTS: str
+    MCP_URL: str = "http://localhost:3000"
     DATABASE_HOST: str = "0.tcp.eu.ngrok.io"
     DATABASE_PORT: int = 19445
     DATABASE_NAME: str = "appdb"
     DATABASE_USER: str = "samuel"
     DATABASE_PASSWORD: str = "samuel123"
     SSL: bool = False
+    MCP_URL: str
 
     @property
     def allowed_hosts_list(self) -> List[str]:
