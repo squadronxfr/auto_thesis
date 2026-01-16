@@ -425,3 +425,4 @@ FodyWeavers.xsd
 .vscode
 /backend/.venv
 /backend/.env
+.github

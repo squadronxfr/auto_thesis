@@ -1,18 +1,15 @@
-# Dans main.py
-from fastapi import FastAPI
-from agents.judge import JudgeAgent
+from fastapi import APIRouter
 from pydantic import BaseModel
+from backend.agent.judge.agents.judge import JudgeAgent
 
-app = FastAPI()
+judge_router = APIRouter()
 
-# Modèle pour tester l'API
 class JudgeRequest(BaseModel):
     draft_text: str
     requirements: str
 
-@app.post("/agents/judge/evaluate")
+@judge_router.post("/evaluate")
 async def run_judge(request: JudgeRequest):
     agent = JudgeAgent()
-    # On lance l'évaluation
     result = await agent.evaluate_text(request.draft_text, request.requirements)
     return result
