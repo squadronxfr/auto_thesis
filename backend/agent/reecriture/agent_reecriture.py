@@ -1,19 +1,60 @@
 import json
 import re
 from typing import Set
-import sys
-import os
 import asyncio
+import logging
+from pydantic import ValidationError
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from judge.agents.base import BaseAgent, AgentConfig
-from reecriture.rewrite_schema import (
+from ..judge.agents.base import BaseAgent, AgentConfig
+from .rewrite_schema import (
     EntreeReecriture, 
     SortieReecriture, 
     ProblemeNonResolu,
 )
-from reecriture.memory_store import obtenir_stockage_memoire
+from .memory_store import obtenir_stockage_memoire
+
+logger = logging.getLogger(__name__)
+
+def creer_config_par_defaut() -> AgentConfig:
+    """Crée la configuration par défaut pour l'agent de réécriture."""
+    return AgentConfig(
+        name="RedacteurAcademique",
+        role="Spécialiste en Rédaction Académique",
+        system_instruction="""
+        Tu es un expert spécialisé en rédaction académique.
+        Ton rôle est d'améliorer les textes brouillons selon des critiques spécifiques.
+        
+        RÈGLES CRITIQUES:
+        1. Applique les corrections UNIQUEMENT pour les critiques fournies
+        2. PRÉSERVE toutes les citations existantes comme [SOURCE_1], [SOURCE_2], etc.
+        3. N'invente PAS et n'ajoute PAS de nouveaux IDs de citation
+        4. Si une critique nécessite d'ajouter des sources que tu n'as pas, marque-la comme non résolue
+        5. Maintiens un ton académique et un style formel
+        6. Garde la structure originale sauf si une critique l'aborde spécifiquement
+        
+        Tu DOIS répondre avec UNIQUEMENT du JSON valide correspondant exactement à cette structure:
+        {
+            "texte_reecrit": "Le texte amélioré ici...",
+            "critiques_resolues": [
+                {
+                    "critique_originale": "Le texte de la critique",
+                    "action_effectuee": "Ce que tu as fait pour corriger"
+                }
+            ],
+            "problemes_non_resolus": [
+                {
+                    "critique": "La critique qui n'a pas pu être corrigée",
+                    "raison": "Pourquoi elle n'a pas pu être résolue (ex: sources manquantes)"
+                }
+            ],
+            "resume_changements": "Résumé bref de tous les changements effectués"
+        }
+        
+        AUCUN texte supplémentaire en dehors de la structure JSON.
+        """,
+        model_name="gemini-1.5-pro-latest",
+        temperature=0.3
+    )
 
 class AgentReecriture(BaseAgent):
     """
@@ -26,45 +67,15 @@ class AgentReecriture(BaseAgent):
     - Stocke les artefacts dans Redis/mémoire
     """
     
-    def __init__(self):
-        config = AgentConfig(
-            name="RedacteurAcademique",
-            role="Spécialiste en Rédaction Académique",
-            system_instruction="""
-            Tu es un expert spécialisé en rédaction académique.
-            Ton rôle est d'améliorer les textes brouillons selon des critiques spécifiques.
-            
-            RÈGLES CRITIQUES:
-            1. Applique les corrections UNIQUEMENT pour les critiques fournies
-            2. PRÉSERVE toutes les citations existantes comme [SOURCE_1], [SOURCE_2], etc.
-            3. N'invente PAS et n'ajoute PAS de nouveaux IDs de citation
-            4. Si une critique nécessite d'ajouter des sources que tu n'as pas, marque-la comme non résolue
-            5. Maintiens un ton académique et un style formel
-            6. Garde la structure originale sauf si une critique l'aborde spécifiquement
-            
-            Tu DOIS répondre avec UNIQUEMENT du JSON valide correspondant exactement à cette structure:
-            {
-                "texte_reecrit": "Le texte amélioré ici...",
-                "critiques_resolues": [
-                    {
-                        "critique_originale": "Le texte de la critique",
-                        "action_effectuee": "Ce que tu as fait pour corriger"
-                    }
-                ],
-                "problemes_non_resolus": [
-                    {
-                        "critique": "La critique qui n'a pas pu être corrigée",
-                        "raison": "Pourquoi elle n'a pas pu être résolue (ex: sources manquantes)"
-                    }
-                ],
-                "resume_changements": "Résumé bref de tous les changements effectués"
-            }
-            
-            AUCUN texte supplémentaire en dehors de la structure JSON.
-            """,
-            model_name="gemini-1.5-pro-latest",
-            temperature=0.3
-        )
+    def __init__(self, config: AgentConfig = None):
+        """
+        Initialise l'agent de réécriture.
+        
+        Args:
+            config: Configuration de l'agent. Si None, utilise la configuration par défaut.
+        """
+        if config is None:
+            config = creer_config_par_defaut()
         super().__init__(config)
         self.stockage_memoire = obtenir_stockage_memoire()
     
@@ -176,7 +187,7 @@ Réécris le texte pour traiter TOUTES les critiques ci-dessus.
                 )
                 
                 if citations_inventees:
-                    print(f"⚠ Citations inventées détectées: {citations_inventees}")
+                    logger.warning(f"Citations inventées détectées: {citations_inventees}")
                     texte_reecrit = self._supprimer_citations_inventees(
                         texte_reecrit,
                         citations_inventees
@@ -191,22 +202,59 @@ Réécris le texte pour traiter TOUTES les critiques ci-dessus.
                 self._stocker_artefact(id_document, iteration, sortie)
                 
                 return sortie
+            
+            except json.JSONDecodeError as e:
+                logger.error(f"Réponse API invalide (JSON malformé): {e}")
+                sortie_erreur = SortieReecriture(
+                    texte_reecrit=donnees_entree.texte_brouillon,
+                    critiques_resolues=[],
+                    problemes_non_resolus=[
+                        ProblemeNonResolu(
+                            critique="Erreur de format de réponse",
+                            raison=f"La réponse de l'API n'est pas un JSON valide: {str(e)}"
+                        )
+                    ],
+                    resume_changements=f"Réécriture échouée: JSON invalide",
+                    iteration=iteration
+                )
+                return sortie_erreur
+            
+            except ValidationError as e:
+                logger.error(f"Validation Pydantic échouée: {e}")
+                sortie_erreur = SortieReecriture(
+                    texte_reecrit=donnees_entree.texte_brouillon,
+                    critiques_resolues=[],
+                    problemes_non_resolus=[
+                        ProblemeNonResolu(
+                            critique="Erreur de validation des données",
+                            raison=f"La structure de la réponse ne correspond pas au schéma attendu: {str(e)}"
+                        )
+                    ],
+                    resume_changements=f"Réécriture échouée: validation échouée",
+                    iteration=iteration
+                )
+                return sortie_erreur
                 
             except Exception as e:
                 error_str = str(e)
+                error_type = type(e).__name__
                 
-                if "429" in error_str or "quota" in error_str.lower():
+                # Gestion spécifique des erreurs de quota/rate limit
+                if "429" in error_str or "quota" in error_str.lower() or "rate" in error_str.lower():
                     if tentative < max_retries - 1:
                         delay = base_delay * (2 ** tentative)
                         match = re.search(r'retry in (\d+\.?\d*)', error_str)
                         if match:
                             delay = max(delay, float(match.group(1)))
                         
-                        print(f"⚠️ Quota API dépassé. Nouvelle tentative dans {delay:.1f}s... (Tentative {tentative + 1}/{max_retries})")
+                        logger.warning(f"Quota API dépassé. Nouvelle tentative dans {delay:.1f}s... (Tentative {tentative + 1}/{max_retries})")
                         await asyncio.sleep(delay)
                         continue
                     else:
-                        print(f"❌ Quota API dépassé après {max_retries} tentatives")
+                        logger.error(f"Quota API dépassé après {max_retries} tentatives")
+                
+                # Logging détaillé pour erreurs inattendues
+                logger.error(f"Erreur inattendue ({error_type}): {error_str}", exc_info=True)
                 
                 sortie_erreur = SortieReecriture(
                     texte_reecrit=donnees_entree.texte_brouillon,
@@ -214,10 +262,10 @@ Réécris le texte pour traiter TOUTES les critiques ci-dessus.
                     problemes_non_resolus=[
                         ProblemeNonResolu(
                             critique="Erreur système pendant la réécriture",
-                            raison=f"Erreur: {str(e)}"
+                            raison=f"Erreur {error_type}: {str(e)}"
                         )
                     ],
-                    resume_changements=f"Réécriture échouée: {str(e)}",
+                    resume_changements=f"Réécriture échouée: {error_type}",
                     iteration=iteration
                 )
                 return sortie_erreur
@@ -257,8 +305,10 @@ Réécris le texte pour traiter TOUTES les critiques ci-dessus.
                 iteration, 
                 artefact
             )
+        except (KeyError, AttributeError) as e:
+            logger.warning(f"Échec du stockage de l'artefact (données manquantes): {e}")
         except Exception as e:
-            print(f"⚠ Échec du stockage de l'artefact: {e}")
+            logger.error(f"Échec inattendu du stockage de l'artefact: {e}", exc_info=True)
     
     def obtenir_historique(self, id_document: str) -> list:
         """Obtient l'historique de réécriture pour un document."""

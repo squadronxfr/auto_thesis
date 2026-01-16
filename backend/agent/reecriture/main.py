@@ -15,9 +15,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Instance unique de l'agent, créée au démarrage de l'application
+agent = AgentReecriture()
+
 class RewriteRequest(BaseModel):
     texte_brouillon: str
-    critiques: List[dict]
+    critiques: List[CritiqueJuge]
     ids_sources_existantes: List[str] = []
     contexte: Optional[str] = None
     iteration: int = 1
@@ -57,7 +60,6 @@ async def root():
 async def health_check():
     """Vérification de l'état de l'API."""
     try:
-        agent = AgentReecriture()
         return {
             "status": "healthy",
             "service": "rewrite_agent",
@@ -81,22 +83,13 @@ async def improve_text(request: RewriteRequest):
         SortieReecriture avec le texte amélioré et métadonnées
     """
     try:
-        critiques_obj = [
-            CritiqueJuge(
-                point_negatif=c["point_negatif"],
-                suggestion=c["suggestion"]
-            )
-            for c in request.critiques
-        ]
-        
         entree = EntreeReecriture(
             texte_brouillon=request.texte_brouillon,
-            critiques=critiques_obj,
+            critiques=request.critiques,
             ids_sources_existantes=request.ids_sources_existantes,
             contexte=request.contexte
         )
         
-        agent = AgentReecriture()
         resultat = await agent.reecrire(
             donnees_entree=entree,
             iteration=request.iteration,
@@ -124,7 +117,6 @@ async def get_history(id_document: str):
     """
     try:
         agent = AgentReecriture()
-        historique = agent.obtenir_historique(id_document)
         
         if not historique:
             return {
