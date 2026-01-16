@@ -185,7 +185,9 @@ Réécris le texte pour traiter TOUTES les critiques ci-dessus.
                         citations_inventees
                     )
                     resultat_dict["texte_reecrit"] = texte_reecrit
-                    resultat_dict["resume_changements"] += f" | {len(citations_inventees)} citation(s) inventée(s) supprimée(s)."
+                    resume_changements = resultat_dict.get("resume_changements", "")
+                    resume_changements += f" | {len(citations_inventees)} citation(s) inventée(s) supprimée(s)."
+                    resultat_dict["resume_changements"] = resume_changements
                 
                 resultat_dict["iteration"] = iteration
                 sortie = SortieReecriture(**resultat_dict)
