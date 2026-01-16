@@ -11,9 +11,7 @@ from judge.agents.base import BaseAgent, AgentConfig
 from reecriture.rewrite_schema import (
     EntreeReecriture, 
     SortieReecriture, 
-    CritiqueResolue, 
     ProblemeNonResolu,
-    CritiqueJuge
 )
 from reecriture.memory_store import obtenir_stockage_memoire
 
