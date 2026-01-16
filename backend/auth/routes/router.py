@@ -162,3 +162,59 @@ def logout_user(authorization: str | None = Header(default=None), db: Session = 
         pass # ou raise HTTPException si strict
 
     return {"message": "Déconnexion réussie"}
+
+
+@user_router.get("/admin/users")
+def get_all_users(authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
+    """
+    Récupère la liste de tous les utilisateurs.
+    Route réservée aux administrateurs.
+    """
+    token_string = extract_bearer_token(authorization)
+
+    try:
+        payload = jwt.decode(token_string, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token invalide ou expiré")
+
+    # Vérifier que l'utilisateur est admin
+    admin_check = db.execute(
+        text('SELECT role FROM "USER" WHERE id = :user_id'),
+        {"user_id": user_id}
+    ).fetchone()
+
+    if not admin_check:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+
+    role = admin_check[0]
+    if role != 'ADMIN':
+        raise HTTPException(status_code=403, detail="Accès refusé. Seuls les administrateurs peuvent accéder à cette route.")
+
+    # Récupérer tous les utilisateurs
+    users = db.execute(
+        text("""
+            SELECT id, first_name, last_name, email, role, created_at, updated_at
+            FROM "USER"
+            ORDER BY created_at DESC
+        """)
+    ).fetchall()
+
+    users_list = [
+        {
+            "id": user[0],
+            "first_name": user[1],
+            "last_name": user[2],
+            "email": user[3],
+            "role": user[4],
+            "createdAt": user[5].isoformat() if user[5] else None,
+            "updatedAt": user[6].isoformat() if user[6] else None
+        }
+        for user in users
+    ]
+
+    return {
+        "message": "Liste des utilisateurs récupérée avec succès",
+        "data": users_list,
+        "total": len(users_list)
+    }

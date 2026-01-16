@@ -50,6 +50,21 @@ export const useGetUserById = (userId: string) => {
     });
 };
 
+/**
+ * Hook pour récupérer la liste complète des utilisateurs (admin)
+ */
+export const useGetAllUsers = () => {
+    return useQuery<UserDto[]>({
+        queryKey: ['users', 'all'],
+        queryFn: async () => {
+            const response = await userService.getAllUsers();
+            return response.data;
+        },
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        refetchOnWindowFocus: false,
+    });
+};
+
 export const useUpdateUser = () => {
     return useMutation<UserDto, Error, { userId: string; user: UserUpdateSchema }>({
         mutationFn: async ({ userId, user }: { userId: string; user: UserUpdateSchema }) => {

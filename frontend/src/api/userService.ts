@@ -29,6 +29,14 @@ class UserService {
     public async deleteUser(userId: string): Promise<ApiResponse<UserDto>> {
         return api.fetchRequest(`${this.apiUrl}/${userId}`, 'DELETE', null, true);
     }
+
+    /**
+     * Récupère la liste de tous les utilisateurs (admin only)
+     * @returns Response avec la liste complète des utilisateurs
+     */
+    public async getAllUsers(): Promise<ApiResponse<UserDto[]>> {
+        return api.fetchRequest('/api/auth/admin/users', 'GET', null, true);
+    }
 }
 
 export const userService = new UserService();

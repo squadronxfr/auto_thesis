@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     Users,
@@ -8,37 +9,57 @@ import {
     Calendar,
     MessageCircle,
 } from 'lucide-react';
-import { Button, Card, Input } from '@/components/ui';
+import { Button, Card, Input, Loader } from '@/components/ui';
 import { Sidebar, Footer } from '@/components/layout';
-import { CLIENTS_FIXTURES } from './fixtures';
+import { useGetAllUsers } from '@/api/queries';
+import { useAuthStore } from '@/stores';
 
 import type { UserDto } from '@/schemas';
 
 export function AdminDashboard() {
+    const navigate = useNavigate();
+    const { user: currentUser } = useAuthStore();
     const [searchQuery, setSearchQuery] = useState('');
-    const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'client'>('all');
+    const [roleFilter, setRoleFilter] = useState<'all' | 'ADMIN' | 'USER'>('all');
 
-    // Utiliser les fixtures
-    const clients = CLIENTS_FIXTURES as UserDto[];
+    // Récupérer les utilisateurs depuis l'API
+    const { data: users = [], isLoading, error } = useGetAllUsers();
 
-    // Filtrer les clients selon la recherche et le rôle
-    const filteredClients = clients.filter((client: UserDto) => {
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+        return (
+            <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
+                <div className="text-center">
+                    <Shield className="mx-auto text-red-400 mb-4" size={64} />
+                    <p className="text-red-400 mb-4 text-lg font-semibold">Accès refusé</p>
+                    <p className="text-slate-400 mb-8">Vous devez être administrateur pour accéder à cette page</p>
+                    <Button 
+                        variant="primary"
+                        onClick={() => navigate('/')}
+                    >
+                        Retour à l'accueil
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    // Filtrer les utilisateurs selon la recherche et le rôle
+    const filteredClients = users.filter((user: UserDto) => {
         const matchesSearch =
-            client.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            client.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            client.email.toLowerCase().includes(searchQuery.toLowerCase());
+            user.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            user.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesRole =
             roleFilter === 'all' ||
-            (roleFilter === 'admin' && client.roles.includes('admin')) ||
-            (roleFilter === 'client' && client.roles.includes('client'));
+            roleFilter === user.role;
 
         return matchesSearch && matchesRole;
     });
 
     // Compter les admins et clients
-    const adminsCount = clients.filter(c => c.roles.includes('admin')).length;
-    const clientsCount = clients.filter(c => c.roles.includes('client')).length;
+    const adminsCount = users.filter((u: UserDto) => u.role === 'ADMIN').length;
+    const clientsCount = users.filter((u: UserDto) => u.role === 'USER').length;
 
     // Formater la date
     const formatDate = (dateString: string) => {
@@ -51,18 +72,36 @@ export function AdminDashboard() {
     };
 
     // Obtenir le label et la couleur du rôle
-    const getRoleDisplay = (roles: string[]) => {
-        const role = roles[0]?.toLowerCase() || 'client';
-        if (role === 'admin') {
+    const getRoleDisplay = (role: string) => {
+        if (role === 'ADMIN') {
             return { label: 'Administrateur', color: 'text-red-400', bgColor: 'bg-red-500/10' };
         }
-        return { label: 'Client', color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' };
+        return { label: 'Utilisateur', color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' };
     };
 
     // Handlers pour les actions
     const handleContactClient = (email: string, first_name: string, last_name: string) => {
         window.location.href = `mailto:${email}?subject=Suivi - ${first_name} ${last_name}`;
     };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
+                <Loader />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-red-400 mb-4">Erreur lors du chargement des utilisateurs</p>
+                    <p className="text-slate-400">{error instanceof Error ? error.message : 'Une erreur inconnue est survenue'}</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -95,7 +134,7 @@ export function AdminDashboard() {
                                             <Users className="text-[#126FFF]" size={20} />
                                         </div>
                                         <div>
-                                            <p className="text-xl md:text-2xl font-bold text-white">{clients.length}</p>
+                                            <p className="text-xl md:text-2xl font-bold text-white">{users.length}</p>
                                             <p className="text-xs md:text-sm text-slate-400">Total des clients</p>
                                         </div>
                                     </div>
@@ -152,18 +191,18 @@ export function AdminDashboard() {
                                     Tous
                                 </Button>
                                 <Button
-                                    variant={roleFilter === 'admin' ? 'primary' : 'outline'}
-                                    onClick={() => setRoleFilter('admin')}
+                                    variant={roleFilter === 'ADMIN' ? 'primary' : 'outline'}
+                                    onClick={() => setRoleFilter('ADMIN')}
                                     className="text-sm"
                                 >
                                     Admin
                                 </Button>
                                 <Button
-                                    variant={roleFilter === 'client' ? 'primary' : 'outline'}
-                                    onClick={() => setRoleFilter('client')}
+                                    variant={roleFilter === 'USER' ? 'primary' : 'outline'}
+                                    onClick={() => setRoleFilter('USER')}
                                     className="text-sm"
                                 >
-                                    Client
+                                    Utilisateur
                                 </Button>
                             </div>
                         </div>
@@ -187,7 +226,7 @@ export function AdminDashboard() {
                             </motion.div>
                         ) : (
                             filteredClients.map((client: UserDto, index: number) => {
-                                const roleDisplay = getRoleDisplay(client.roles);
+                                const roleDisplay = getRoleDisplay(client.role);
                                 return (
                                     <motion.div
                                         key={client.id}
