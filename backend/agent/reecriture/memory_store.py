@@ -149,3 +149,17 @@ def obtenir_stockage_memoire() -> StockageMemoire:
     if _stockage_memoire is None:
         _stockage_memoire = StockageMemoire()
     return _stockage_memoire
+
+def reinitialiser_stockage_memoire(nouvelle_instance: Optional[StockageMemoire] = None) -> StockageMemoire:
+    """
+    Réinitialise l'instance globale de stockage mémoire.
+
+    Utile pour les tests ou lorsqu'une nouvelle instance isolée est nécessaire.
+    Si `nouvelle_instance` est fourni, il sera utilisé comme singleton.
+    Sinon, une nouvelle instance de `StockageMemoire` est créée.
+    """
+    global _stockage_memoire
+    if nouvelle_instance is None:
+        nouvelle_instance = StockageMemoire()
+    _stockage_memoire = nouvelle_instance
+    return _stockage_memoire
