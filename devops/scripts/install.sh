@@ -22,8 +22,21 @@ fi
 
 echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 
+# Arrêter les conteneurs existants pour une mise à jour propre
+echo "🔄 Arrêt des conteneurs existants..."
+docker compose --env-file devops/.env -f devops/compose/compose.prod.yml down
+
+# Pull des nouvelles images
+echo "📦 Téléchargement des nouvelles images..."
 docker compose --env-file devops/.env -f devops/compose/compose.prod.yml pull
+
+# Démarrage des services
+echo "🚀 Démarrage des services..."
 docker compose --env-file devops/.env -f devops/compose/compose.prod.yml up -d --remove-orphans
+
+# Nettoyage des anciennes images
+echo "🧹 Nettoyage des anciennes images..."
+docker image prune -f
 
 echo "✅ Install/Deploy terminé"
 docker compose --env-file devops/.env -f devops/compose/compose.prod.yml ps
