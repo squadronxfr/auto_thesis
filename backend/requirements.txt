@@ -72,6 +72,7 @@ typing_extensions==4.15.0
 uritemplate==4.2.0
 urllib3==2.6.3
 uvicorn==0.40.0
-uvloop==0.22.1
+# uvloop==0.22.1  # Non compatible avec Windows - optionnel pour améliorer les performances sur Unix/Linux/macOS
 watchfiles==1.1.1
-websockets==16.0
+websockets>=13.0.0,<15.1.0  # Compatible avec google-genai 1.58.0
+sqlalchemy

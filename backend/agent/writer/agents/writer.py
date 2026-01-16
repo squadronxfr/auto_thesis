@@ -1,6 +1,8 @@
 import json
 from .base import BaseAgent, AgentConfig
 from .writer_schema import WriterInput, DraftOutput, WriterMode, ContentType
+from google import genai
+from google.genai import types
 
 class WriterAgent(BaseAgent):
     def __init__(self):
@@ -22,7 +24,7 @@ class WriterAgent(BaseAgent):
         
         if mode == WriterMode.METHODOLOGIE:
             return """
-            MODE ACTIVÉ : 🔬 MÉTHODOLOGIE SCIENTIFIQUE
+            MODE ACTIVÉ : MÉTHODOLOGIE SCIENTIFIQUE
             Ton objectif est de décrire COMMENT la recherche est menée.
             - Utilise un ton froid, objectif et précis.
             - Vocabulaire requis : "échantillon", "biais", "variables", "corrélation", "validité".
@@ -32,7 +34,7 @@ class WriterAgent(BaseAgent):
             
         elif mode == WriterMode.PROBLEMATIQUE:
             return """
-            MODE ACTIVÉ : ❓ PROBLÉMATISATION
+            MODE ACTIVÉ : PROBLÉMATISATION
             Ton objectif est de poser les fondations théoriques.
             - Formule des hypothèses claires (H1, H2...).
             - Identifie les lacunes de la littérature existante ("research gap").
@@ -42,7 +44,7 @@ class WriterAgent(BaseAgent):
             
         elif mode == WriterMode.INTRODUCTION:
             return """
-            MODE ACTIVÉ : 📖 INTRODUCTION ACADÉMIQUE
+            MODE ACTIVÉ : INTRODUCTION ACADÉMIQUE
             Ton objectif est de rédiger une introduction captivante et structurée.
             - Commence par contextualiser le sujet dans son domaine.
             - Présente la problématique de manière progressive et claire.
@@ -53,7 +55,7 @@ class WriterAgent(BaseAgent):
             
         else: # WriterMode.GENERAL
             return """
-            MODE ACTIVÉ : 📝 RÉDACTION ACADÉMIQUE STANDARD
+            MODE ACTIVÉ : RÉDACTION ACADÉMIQUE STANDARD
             Ton objectif est de rédiger du contenu fluide et structuré.
             - Adopte un style formel (pas de "je", utilise "nous" ou le passif).
             - Connecte les idées avec des connecteurs logiques (En effet, Par conséquent...).
@@ -68,7 +70,7 @@ class WriterAgent(BaseAgent):
         
         if content_type == ContentType.PLAN:
             return """
-            TYPE DE CONTENU : 📋 PLAN DU MÉMOIRE
+            TYPE DE CONTENU : PLAN DU MÉMOIRE
             - Génère une structure hiérarchique claire (H1, H2, H3).
             - Chaque section doit avoir un titre descriptif.
             - Indique brièvement le contenu attendu pour chaque section.
@@ -77,7 +79,7 @@ class WriterAgent(BaseAgent):
             
         elif content_type == ContentType.BIBLIOGRAPHIE:
             return """
-            TYPE DE CONTENU : 📚 BIBLIOGRAPHIE
+            TYPE DE CONTENU : BIBLIOGRAPHIE
             - Liste les sources utilisées dans un format académique standard (APA, MLA, etc.).
             - Organise par catégories si nécessaire (Livres, Articles, Sites web).
             - Inclus les informations complètes : Auteur, Titre, Date, Éditeur, etc.
@@ -86,7 +88,7 @@ class WriterAgent(BaseAgent):
             
         elif content_type == ContentType.INTRODUCTION:
             return """
-            TYPE DE CONTENU : 🎯 INTRODUCTION
+            TYPE DE CONTENU : INTRODUCTION
             - Structure classique : Contexte → Problématique → Objectifs → Plan
             - Longueur appropriée (généralement 5-10% du mémoire total).
             - Accroche le lecteur dès les premières lignes.
@@ -95,7 +97,7 @@ class WriterAgent(BaseAgent):
             
         elif content_type == ContentType.CONCLUSION:
             return """
-            TYPE DE CONTENU : 🏁 CONCLUSION
+            TYPE DE CONTENU : CONCLUSION
             - Synthétise les points clés développés dans le mémoire.
             - Répond à la problématique posée en introduction.
             - Présente les limites de la recherche.
@@ -104,7 +106,7 @@ class WriterAgent(BaseAgent):
             
         else: # ContentType.SECTION
             return """
-            TYPE DE CONTENU : 📄 SECTION DU MÉMOIRE
+            TYPE DE CONTENU : SECTION DU MÉMOIRE
             - Développe le sujet de manière approfondie et structurée.
             - Respecte le niveau hiérarchique indiqué (H1, H2, H3).
             - Assure la cohérence avec le reste du document.
@@ -147,7 +149,7 @@ class WriterAgent(BaseAgent):
             prompt_parts.append(f"PUBLIC CIBLE : {input_data.target_audience}")
         
         prompt_parts.append(f"\nTÂCHE : Rédige ce contenu en respectant le mode et le type de contenu spécifiés.")
-        prompt_parts.append("FORMAT DE SORTIE : JSON uniquement avec les clés 'content', 'word_count', 'sources_used', 'content_type' (optionnel), 'structure_hints' (optionnel).")
+        prompt_parts.append("IMPORTANT : Utilise la fonction 'generate_academic_content' pour retourner le contenu structuré avec toutes les métadonnées requises.")
         
         return "\n".join(prompt_parts)
     
@@ -175,7 +177,7 @@ IMPORTANT - FORMAT DE RÉPONSE JSON :
     async def generate_draft(self, input_data: WriterInput) -> DraftOutput:
         """
         Génère le texte en fonction du mode, du type de contenu et du contexte.
-        Méthode principale modulaire et extensible.
+        Utilise l'appel de fonction Gemini pour garantir un format structuré optimal.
         """
         
         # 1. Construction des prompts de manière modulaire
@@ -183,22 +185,83 @@ IMPORTANT - FORMAT DE RÉPONSE JSON :
         user_prompt = self._build_user_prompt(input_data)
         
         try:
-            # 2. Création du modèle avec le prompt système personnalisé
-            temp_model = self._create_temp_model(full_system_prompt)
+            # 2. Création de la déclaration de fonction
+            function_declaration = self._get_function_declaration()
             
-            # 3. Génération du contenu
-            response = temp_model.generate_content(
-                user_prompt,
-                generation_config={"response_mime_type": "application/json"}
+            # 3. Configuration du client Gemini avec la nouvelle API
+            client = genai.Client(api_key=self._get_api_key())
+            
+            # 4. Création de l'outil (Tool) avec la déclaration de fonction
+            tools = types.Tool(function_declarations=[function_declaration])
+            
+            # 5. Configuration de génération avec les outils
+            config = types.GenerateContentConfig(
+                tools=[tools],
+                system_instruction=full_system_prompt
             )
             
-            # 4. Parsing et validation du JSON
-            raw_data = json.loads(response.text)
+            # 6. Génération du contenu avec appel de fonction
+            response = client.models.generate_content(
+                model=self.config.model_name,
+                contents=user_prompt,
+                config=config
+            )
             
-            # 5. Correction automatique des erreurs communes
+            # 7. Vérification et extraction de l'appel de fonction
+            if not response.candidates or len(response.candidates) == 0:
+                raise Exception("Aucune réponse générée par le modèle")
+            
+            candidate = response.candidates[0]
+            if not candidate.content or len(candidate.content.parts) == 0:
+                raise Exception("Aucune partie dans la réponse du modèle")
+            
+            part = candidate.content.parts[0]
+            
+            # 8. Vérification si c'est un appel de fonction
+            if hasattr(part, 'function_call') and part.function_call:
+                function_call = part.function_call
+                print(f"✅ Fonction appelée : {function_call.name}")
+                
+                # 9. Extraction des arguments de la fonction (qui contiennent notre JSON structuré)
+                if hasattr(function_call, 'args'):
+                    # Les args peuvent être un dict ou un objet avec des attributs
+                    if isinstance(function_call.args, dict):
+                        raw_data = function_call.args
+                    elif hasattr(function_call.args, '__dict__'):
+                        raw_data = function_call.args.__dict__
+                    else:
+                        # Essayer de convertir en dict
+                        raw_data = dict(function_call.args) if function_call.args else {}
+                    
+                    if not raw_data:
+                        raise Exception("Aucun argument trouvé dans l'appel de fonction")
+                else:
+                    raise Exception("L'appel de fonction n'a pas d'attribut 'args'")
+            else:
+                # Fallback : si pas d'appel de fonction, essayer de parser le texte
+                print("⚠️ Pas d'appel de fonction détecté, tentative de parsing du texte...")
+                # Essayer d'accéder au texte depuis différentes sources possibles
+                text_content = None
+                if hasattr(part, 'text') and part.text:
+                    text_content = part.text
+                elif hasattr(response, 'text') and response.text:
+                    text_content = response.text
+                elif hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                    # Chercher dans toutes les parties
+                    for p in candidate.content.parts:
+                        if hasattr(p, 'text') and p.text:
+                            text_content = p.text
+                            break
+                
+                if text_content:
+                    raw_data = json.loads(text_content)
+                else:
+                    raise Exception("Aucun appel de fonction et aucun texte disponible dans la réponse")
+            
+            # 10. Correction automatique des erreurs communes
             raw_data = self._fix_common_errors(raw_data, input_data)
             
-            # 6. Création de l'objet de sortie
+            # 11. Création de l'objet de sortie
             return DraftOutput(**raw_data)
             
         except json.JSONDecodeError as e:
@@ -211,12 +274,19 @@ IMPORTANT - FORMAT DE RÉPONSE JSON :
             )
         except Exception as e:
             print(f"❌ Erreur Writer: {e}")
+            import traceback
+            traceback.print_exc()
             return DraftOutput(
                 content=f"Erreur de génération : {str(e)}",
                 word_count=0,
                 sources_used=[],
                 content_type=input_data.content_type.value
             )
+    
+    def _get_api_key(self) -> str:
+        """Récupère la clé API depuis les settings"""
+        from backend.config.settings import settings
+        return settings.GEMINI_API_KEY
     
     def _fix_common_errors(self, raw_data: dict, input_data: WriterInput) -> dict:
         """
@@ -242,6 +312,44 @@ IMPORTANT - FORMAT DE RÉPONSE JSON :
         
         return raw_data
 
+    def _get_function_declaration(self) -> dict:
+        """
+        Crée la déclaration de fonction pour l'appel de fonction Gemini.
+        Cette fonction structure la réponse JSON de manière optimisée pour Gemini.
+        """
+        return {
+            "name": "generate_academic_content",
+            "description": "Génère du contenu académique structuré pour un mémoire de thèse. Retourne le texte rédigé avec ses métadonnées.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "string",
+                        "description": "Le texte rédigé complet pour la section demandée"
+                    },
+                    "word_count": {
+                        "type": "integer",
+                        "description": "Nombre de mots approximatif dans le contenu généré"
+                    },
+                    "sources_used": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Liste des sources citées ou utilisées dans le texte (peut être vide)"
+                    },
+                    "content_type": {
+                        "type": "string",
+                        "description": "Type de contenu généré (plan, bibliographie, introduction, section, conclusion)"
+                    },
+                    "structure_hints": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Indices sur la structure générée (optionnel, utile pour les plans et bibliographies)"
+                    }
+                },
+                "required": ["content", "word_count", "sources_used"]
+            }
+        }
+    
     def _create_temp_model(self, system_instruction):
         """Helper pour recharger le modèle avec un nouveau prompt système"""
         import google.generativeai as genai
