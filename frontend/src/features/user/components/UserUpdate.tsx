@@ -20,8 +20,8 @@ export function UserUpdate({ user, onSubmit, isOpen, onClose }: UserUpdateProps)
         resolver: zodResolver(userUpdateSchema),
         defaultValues: {
             email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            first_name: user.first_name,
+            last_name: user.last_name,
         },
     });
 
@@ -53,7 +53,7 @@ export function UserUpdate({ user, onSubmit, isOpen, onClose }: UserUpdateProps)
                         <div className="flex-1">
                             <Input
                                 label="Nom"
-                                {...register('lastName')}
+                                {...register('last_name')}
                                 type="text"
                                 placeholder="Nom du consultant"
                                 rightIcon={<User className="h-4 w-4 text-gray-500" />}
@@ -62,7 +62,7 @@ export function UserUpdate({ user, onSubmit, isOpen, onClose }: UserUpdateProps)
                         <div className="flex-1">
                             <Input
                                 label="Prénom"
-                                {...register('firstName')}
+                                {...register('first_name')}
                                 type="text"
                                 placeholder="Prénom du consultant"
                                 rightIcon={<User className="h-4 w-4 text-gray-500" />}

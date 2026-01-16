@@ -24,8 +24,8 @@ export function Profile() {
             <h1 className="text-2xl font-bold">Profile</h1>
             <div className="flex flex-col items-center justify-center">
                 <p className="text-sm text-gray-500">{user?.email}</p>
-                <p className="text-sm text-gray-500">{user?.firstName}</p>
-                <p className="text-sm text-gray-500">{user?.lastName}</p>
+                <p className="text-sm text-gray-500">{user?.first_name}</p>
+                <p className="text-sm text-gray-500">{user?.last_name}</p>
                 <p className="text-sm text-gray-500">{user?.roles}</p>
             </div>
         </div>

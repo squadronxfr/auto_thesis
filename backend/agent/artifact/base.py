@@ -3,16 +3,15 @@ import google.generativeai as genai
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
+from backend.config.settings import settings
 
 # Charge les variables d'environnement
 load_dotenv()
 
 # Configuration de Gemini
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    raise ValueError("GEMINI_API_KEY non trouvée dans les variables d'environnement")
 
-genai.configure(api_key=api_key)
+
+genai.configure(api_key=settings.GEMINI_API_KEY)
 
 # Modèle de configuration pour un agent
 class AgentConfig(BaseModel):

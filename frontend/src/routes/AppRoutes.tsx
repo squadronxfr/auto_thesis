@@ -14,10 +14,12 @@ import { LandingPage } from '@/features/landing';
 import { Profile } from '@/features/user';
 import { Users } from '@/features/users';
 import { DashboardCustomer } from '@/features/documents';
+import { UploadDocument } from '@/features/upload';
 
 import { useMetadata } from '@/lib/metadata';
 
 import { useAuthStore } from '@/stores/authStore';
+import { AdminDashboard } from '@/features/admin';
 
 export function AppRoutes() {
     const { isAuthenticated } = useAuthStore();
@@ -55,12 +57,16 @@ export function AppRoutes() {
                             <Route path="/register" element={<Register />} />
                             <Route path="/forgot-password" element={<ForgotPassword />} />
                             <Route path="/dashboard" element={<DashboardCustomer />} />
+                            <Route path="/admin" element={<AdminDashboard />} />
+                            <Route path="/upload" element={<UploadDocument />} />
+
                         </Route>
 
                         {/* Routes privées */}
                         <Route element={<PrivateRoutes />}>
                             <Route path="/app" element={<Navigate to="/profile" replace />} />
                             <Route path="/dashboard" element={<DashboardCustomer />} />
+                            <Route path="/admin" element={<AdminDashboard />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/users" element={<Users />} />
                         </Route>
