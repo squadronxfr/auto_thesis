@@ -53,5 +53,25 @@ class MCPClient:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    async def generate_pdf(
+            self,
+            file_path: str,
+            content: str,
+            title: str = "Document"
+    ) -> Dict[str, Any]:
+        """Generate PDF from markdown content"""
+        try:
+            response = await self.client.post(
+                f"{self.base_url}/tools/generate_pdf",
+                json={
+                    "file_path": file_path,
+                    "content": content,
+                    "title": title
+                }
+            )
+            return response.json()
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
     async def close(self):
         await self.client.aclose()

@@ -7,6 +7,7 @@ from backend.agent.writer.router import writer_router
 from backend.agent.research.router import research_router
 from backend.agent.artifact.router import artifact_router
 from backend.mcp.router import router as mcp_router
+from backend.agent.workflow.router import workflow_router
 
 app = FastAPI(
     title="Auto Thesis API",
@@ -28,6 +29,7 @@ app.include_router(writer_router, prefix="/api/v1/writer", tags=["Agent Writer"]
 app.include_router(research_router, prefix="/api/v1/research", tags=["Research"])
 app.include_router(artifact_router, prefix="/api/v1/artifact", tags=["Agent Artifact"])
 app.include_router(mcp_router, prefix="/api/v1/mcp", tags=["MCP Tools"])
+app.include_router(workflow_router, prefix="/api/v1/workflow", tags=["Workflow"])
 
 @app.get("/")
 def root():
