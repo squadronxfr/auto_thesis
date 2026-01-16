@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-ENV_FILE="${REPO_ROOT}/devops/.env"
+ENV_FILE="${REPO_ROOT}/devops/.env.example"
 BASE_COMPOSE="${REPO_ROOT}/devops/compose/compose.yml"
 PROD_COMPOSE="${REPO_ROOT}/devops/compose/compose.prod.yml"
 
