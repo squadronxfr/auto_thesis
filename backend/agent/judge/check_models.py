@@ -12,7 +12,6 @@ print("🔍 Recherche des modèles disponibles pour ta clé...\n")
 try:
     available_models = []
     for m in genai.list_models():
-        # On cherche uniquement les modèles qui savent générer du texte
         if 'generateContent' in m.supported_generation_methods:
             print(f"✅ DISPONIBLE : {m.name}")
             available_models.append(m.name)
