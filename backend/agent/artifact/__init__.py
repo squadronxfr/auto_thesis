@@ -1,9 +1,7 @@
-# ===== AGENT ARTEFACT - FICHIERS INIT =====
+# ===== AGENT ARTEFACT SIMPLIFIÉ - PostgreSQL =====
 
 from .agents.artifact import ArtifactAgent
-from .redis_manager import RedisMemoryManager
-from .models.data_models import (
-    ArtifactMemory, MemoryContext, ProjectSnapshot,
+from .db_models import (
     Request, RequestStep, Activity, Document, Token, User,
     ActivityType, RequestStatus, DocumentType
 )
@@ -11,26 +9,18 @@ from .models.data_models import (
 __version__ = "1.0.0"
 __author__ = "Auto Thesis Multi-Agent System"
 
-# Exports principaux
+# Exports principaux (PostgreSQL uniquement)
 __all__ = [
     # Agent principal
     "ArtifactAgent",
     
-    # Gestionnaire Redis
-    "RedisMemoryManager", 
-    
-    # Modèles de données
-    "ArtifactMemory",
-    "MemoryContext", 
-    "ProjectSnapshot",
+    # Modèles PostgreSQL
     "Request",
-    "RequestStep",
-    "Activity", 
+    "RequestStep", 
+    "Activity",
     "Document",
-    "Token",
+    "Token", 
     "User",
-    
-    # Enums
     "ActivityType",
     "RequestStatus", 
     "DocumentType"
