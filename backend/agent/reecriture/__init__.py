@@ -6,5 +6,5 @@ __all__ = [
     'SortieReecriture', 
     'CritiqueJuge',
     'CritiqueResolue',
-    'obtenir_stockage_memoire'
+]
 ]
