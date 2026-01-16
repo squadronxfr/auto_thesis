@@ -26,7 +26,10 @@ class RewriteRequest(BaseModel):
     ids_sources_existantes: List[str] = []
     contexte: str = None
     iteration: int = 1
-    id_document: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id_document: str = Field(
+        default_factory=lambda: str(uuid.uuid4()),
+        description="Unique identifier for the document. If not provided, a UUID will be automatically generated to prevent data collisions."
+    )
 
     class Config:
         schema_extra = {
