@@ -87,22 +87,7 @@ CREATE INDEX idx_source_document_id ON SOURCE(document_id);
 -- ==========================================
 
 -- Nettoyage
-DELETE FROM SOURCE;
-DELETE FROM REQUEST_STEP;
-DELETE FROM ACTIVITY;
-DELETE FROM DOCUMENT;
-DELETE FROM REQUEST;
-DELETE FROM TOKEN;
-DELETE FROM "USER";
-
--- Reset Séquences
-ALTER SEQUENCE "USER_id_seq" RESTART WITH 1;
-ALTER SEQUENCE TOKEN_id_seq RESTART WITH 1;
-ALTER SEQUENCE REQUEST_id_seq RESTART WITH 1;
-ALTER SEQUENCE ACTIVITY_id_seq RESTART WITH 1;
-ALTER SEQUENCE DOCUMENT_id_seq RESTART WITH 1;
-ALTER SEQUENCE REQUEST_STEP_id_seq RESTART WITH 1;
-ALTER SEQUENCE SOURCE_id_seq RESTART WITH 1;
+TRUNCATE "USER", TOKEN, REQUEST, ACTIVITY, DOCUMENT, SOURCE, REQUEST_STEP RESTART IDENTITY CASCADE;
 
 -- 1. UTILISATEURS
 INSERT INTO "USER" (first_name, last_name, email, password, role, created_at, updated_at) VALUES
@@ -115,9 +100,9 @@ INSERT INTO "USER" (first_name, last_name, email, password, role, created_at, up
 
 -- 2. TOKENS
 INSERT INTO TOKEN (token_string, user_id, created_at) VALUES
-    ('token_user_2_' || MD5(RANDOM()::TEXT), 2, NOW() - INTERVAL '5 days'),
-    ('token_user_3_' || MD5(RANDOM()::TEXT), 3, NOW() - INTERVAL '3 days'),
-    ('token_user_4_' || MD5(RANDOM()::TEXT), 4, NOW() - INTERVAL '1 day');
+    ('token_user_2_' || RANDOM()::TEXT, 2, NOW() - INTERVAL '5 days'),
+    ('token_user_3_' || RANDOM()::TEXT, 3, NOW() - INTERVAL '3 days'),
+    ('token_user_4_' || RANDOM()::TEXT, 4, NOW() - INTERVAL '1 day');
 
 -- 3. REQUESTS
 INSERT INTO REQUEST (name, status, user_id, created_at) VALUES
@@ -149,57 +134,83 @@ DECLARE
     rec_req RECORD;
     clean_name TEXT;
     new_doc_id BIGINT;
+    
+    -- On déclare une variable de configuration "Clé de recherche" -> "Liste de sources"
+    sources_config JSONB := '
+    {
+        "IA": [
+            {"title": "Introduction to Machine Learning", "summary": "Guide complet ML", "link": "https://example.com/ml-intro", "date": "2023-01-15"},
+            {"title": "Deep Learning Fundamentals", "summary": "Concepts réseaux neurones", "link": "https://example.com/deep-learning", "date": "2023-06-20"},
+            {"title": "AI Ethics and Governance", "summary": "Enjeux éthiques", "link": "https://example.com/ai-ethics", "date": "2024-01-10"}
+        ],
+        "Web": [
+            {"title": "Modern Web Development with React", "summary": "Tutoriel React", "link": "https://example.com/react-guide", "date": "2023-09-15"},
+            {"title": "Node.js Best Practices", "summary": "Bonnes pratiques Node", "link": "https://example.com/nodejs", "date": "2023-11-01"}
+        ],
+        "Systèmes": [
+            {"title": "Distributed Systems Design", "summary": "Conception scalable", "link": "https://example.com/distributed-systems", "date": "2023-08-22"},
+            {"title": "Microservices Architecture", "summary": "Architecture microservices", "link": "https://example.com/microservices", "date": "2023-12-05"}
+        ],
+        "Blockchain": [
+            {"title": "Blockchain Technology Explained", "summary": "Explication blockchain", "link": "https://example.com/blockchain", "date": "2024-02-01"},
+            {"title": "Cryptocurrency Fundamentals", "summary": "Fondamentaux crypto", "link": "https://example.com/crypto", "date": "2024-01-20"}
+        ],
+        "Mobile": [
+            {"title": "React Native Development", "summary": "Guide React Native", "link": "https://example.com/react-native", "date": "2023-10-15"},
+            {"title": "Mobile App Performance", "summary": "Optimisation perf", "link": "https://example.com/mobile-perf", "date": "2023-11-30"}
+        ],
+        "Cloud": [
+            {"title": "Cloud Computing Fundamentals", "summary": "Intro Cloud", "link": "https://example.com/cloud-intro", "date": "2023-07-10"},
+            {"title": "DevOps Best Practices", "summary": "CI/CD et DevOps", "link": "https://example.com/devops", "date": "2024-01-05"}
+        ]
+    }';
+    
+    config_key TEXT;
+    source_item JSONB;
 BEGIN
     FOR rec_req IN SELECT * FROM REQUEST ORDER BY id LOOP
         
-        -- Nettoyage du nom pour le fichier
+        -- 1. Nettoyage du nom (identique à ton code)
         clean_name := lower(regexp_replace(regexp_replace(rec_req.name, '\s+', '_', 'g'), '[^a-z0-9_]', '', 'g'));
 
-        -- A. Création Document SOURCE
+        -- 2. Création Document SOURCE
         INSERT INTO DOCUMENT (name, document_type, request_id, user_id, created_at)
         VALUES (clean_name || '_source.pdf', 'SOURCE', rec_req.id, rec_req.user_id, rec_req.created_at)
-        RETURNING id INTO new_doc_id; -- On capture l'ID généré pour y attacher les sources juste après
+        RETURNING id INTO new_doc_id;
 
-        -- B. Insertion des SOURCES spécifiques pour ce document
-        IF rec_req.name LIKE 'Mémoire sur l''IA%' THEN
-            INSERT INTO SOURCE (document_id, title, summary, link, date) VALUES
-            (new_doc_id, 'Introduction to Machine Learning', 'Guide complet ML', 'https://example.com/ml-intro', '2023-01-15'),
-            (new_doc_id, 'Deep Learning Fundamentals', 'Concepts réseaux neurones', 'https://example.com/deep-learning', '2023-06-20'),
-            (new_doc_id, 'AI Ethics and Governance', 'Enjeux éthiques', 'https://example.com/ai-ethics', '2024-01-10');
+        -- 3. Moteur d'insertion dynamique des SOURCES
+        -- On parcourt les clés du JSON (IA, Web, Blockchain...)
+        FOR config_key IN SELECT jsonb_object_keys(sources_config) LOOP
             
-        ELSIF rec_req.name LIKE 'Développement Web%' THEN
-            INSERT INTO SOURCE (document_id, title, summary, link, date) VALUES
-            (new_doc_id, 'Modern Web Development with React', 'Tutoriel React', 'https://example.com/react-guide', '2023-09-15'),
-            (new_doc_id, 'Node.js Best Practices', 'Bonnes pratiques Node', 'https://example.com/nodejs', '2023-11-01');
+            -- Si le nom de la requête contient la clé (ex: "Mémoire IA" contient "IA")
+            IF rec_req.name LIKE '%' || config_key || '%' THEN
+                
+                -- On boucle sur chaque source définie dans le tableau JSON associé à cette clé
+                FOR source_item IN SELECT * FROM jsonb_array_elements(sources_config -> config_key) LOOP
+                    INSERT INTO SOURCE (document_id, title, summary, link, date)
+                    VALUES (
+                        new_doc_id,
+                        source_item ->> 'title',
+                        source_item ->> 'summary',
+                        source_item ->> 'link',
+                        (source_item ->> 'date')::DATE
+                    );
+                END LOOP;
+                
+                -- Optimisation : On arrête de chercher d'autres clés une fois qu'on a trouvé une correspondance
+                EXIT; 
+            END IF;
+        END LOOP;
 
-        ELSIF rec_req.name LIKE 'Analyse des Systèmes%' THEN
-            INSERT INTO SOURCE (document_id, title, summary, link, date) VALUES
-            (new_doc_id, 'Distributed Systems Design', 'Conception scalable', 'https://example.com/distributed-systems', '2023-08-22'),
-            (new_doc_id, 'Microservices Architecture', 'Architecture microservices', 'https://example.com/microservices', '2023-12-05');
-
-        ELSIF rec_req.name LIKE 'Blockchain%' THEN
-            INSERT INTO SOURCE (document_id, title, summary, link, date) VALUES
-            (new_doc_id, 'Blockchain Technology Explained', 'Explication blockchain', 'https://example.com/blockchain', '2024-02-01'),
-            (new_doc_id, 'Cryptocurrency Fundamentals', 'Fondamentaux crypto', 'https://example.com/crypto', '2024-01-20');
-
-        ELSIF rec_req.name LIKE 'Application Mobile%' THEN
-            INSERT INTO SOURCE (document_id, title, summary, link, date) VALUES
-            (new_doc_id, 'React Native Development', 'Guide React Native', 'https://example.com/react-native', '2023-10-15'),
-            (new_doc_id, 'Mobile App Performance', 'Optimisation perf', 'https://example.com/mobile-perf', '2023-11-30');
-
-        ELSIF rec_req.name LIKE 'Cloud Computing%' THEN
-            INSERT INTO SOURCE (document_id, title, summary, link, date) VALUES
-            (new_doc_id, 'Cloud Computing Fundamentals', 'Intro Cloud', 'https://example.com/cloud-intro', '2023-07-10'),
-            (new_doc_id, 'DevOps Best Practices', 'CI/CD et DevOps', 'https://example.com/devops', '2024-01-05');
-        END IF;
-
-        -- C. Création Document FINAL (si terminé)
+        -- 4. Création Document FINAL (si terminé)
         IF rec_req.status = 'COMPLETED' THEN
             INSERT INTO DOCUMENT (name, document_type, request_id, user_id, created_at)
             VALUES (clean_name || '_final.pdf', 'FINAL', rec_req.id, rec_req.user_id, rec_req.created_at + INTERVAL '5 days');
         END IF;
 
     END LOOP;
+    
+    RAISE NOTICE '✓ Documents et sources générés via configuration dynamique JSONB.';
 END $$;
 
 -- 6. REQUEST STEPS
