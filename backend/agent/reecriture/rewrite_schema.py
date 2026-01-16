@@ -3,52 +3,52 @@ from typing import List, Optional
 from datetime import datetime
 
 class CritiqueJuge(BaseModel):
-    """Critique du Judge (format original sans sévérité)."""
-    point_negatif: str = Field(description="Ce qui ne va pas dans le texte")
-    suggestion: str = Field(description="Comment l'améliorer concrètement")
+    """Judge's critique (original format without severity)."""
+    point_negatif: str = Field(description="What is wrong or problematic in the text")
+    suggestion: str = Field(description="How to concretely improve it")
 
 class EntreeReecriture(BaseModel):
-    """Entrée pour l'Agent de Réécriture."""
-    texte_brouillon: str = Field(description="Le texte brouillon original à réécrire")
+    """Input for the Rewriting Agent."""
+    texte_brouillon: str = Field(description="The original draft text to be rewritten")
     critiques: List[CritiqueJuge] = Field(
-        description="Liste des critiques du Juge"
+        description="List of critiques from the Judge"
     )
     ids_sources_existantes: List[str] = Field(
         default_factory=list,
-        description="IDs de citations valides qui existent (ex: ['SOURCE_1', 'SOURCE_2'])"
+        description="IDs of valid citations that already exist (e.g., ['SOURCE_1', 'SOURCE_2'])"
     )
     contexte: Optional[str] = Field(
         default=None,
-        description="Contexte ou exigences supplémentaires pour la réécriture"
+        description="Additional context or requirements for the rewriting"
     )
 
 class CritiqueResolue(BaseModel):
-    """Une critique qui a été traitée avec succès."""
+    """A critique that has been successfully addressed."""
     critique_originale: str
     action_effectuee: str
 
 class ProblemeNonResolu(BaseModel):
-    """Un problème qui n'a pas pu être résolu."""
+    """A problem that could not be resolved."""
     critique: str
     raison: str
 
 class SortieReecriture(BaseModel):
-    """Sortie de l'Agent de Réécriture."""
-    texte_reecrit: str = Field(description="Le texte amélioré après réécriture")
+    """Output of the Rewriting Agent."""
+    texte_reecrit: str = Field(description="The improved text after rewriting")
     critiques_resolues: List[CritiqueResolue] = Field(
-        description="Critiques qui ont été corrigées avec succès"
+        description="Critiques that have been successfully fixed"
     )
     problemes_non_resolus: List[ProblemeNonResolu] = Field(
-        description="Problèmes qui n'ont pas pu être résolus (ex: sources manquantes)"
+        description="Problems that could not be resolved (e.g., missing sources)"
     )
     resume_changements: str = Field(
-        description="Résumé bref de tous les changements effectués"
+        description="Brief summary of all the changes made"
     )
     iteration: int = Field(
         default=1,
-        description="Numéro d'itération de réécriture"
+        description="Rewriting iteration number"
     )
     horodatage: str = Field(
         default_factory=lambda: datetime.utcnow().isoformat(),
-        description="Quand cette réécriture a été effectuée"
+        description="When this rewriting was performed (UTC ISO timestamp)"
     )
