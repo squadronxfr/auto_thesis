@@ -90,7 +90,7 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "${FRONTEND_HOST_PORT:-40000}:3000"
+      - "${FRONTEND_HOST_PORT:-40000}:80"
     networks:
       - app-network
 
