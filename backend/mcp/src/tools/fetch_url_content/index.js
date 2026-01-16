@@ -3,31 +3,31 @@ import * as cheerio from 'cheerio';
 
 export const fetchUrlContentTool = {
   name: 'fetch_url_content',
-  description: 'Search the web and fetch content from URLs. Can generate search terms with AI or use provided query.',
+  description: 'Recherche sur le web et récupère le contenu depuis des URLs. Peut générer des termes de recherche avec l\'IA ou utiliser une requête fournie.',
   parameters: {
     type: 'object',
     properties: {
       url: {
         type: 'string',
-        description: 'A specific URL to fetch content from'
+        description: 'Une URL spécifique pour récupérer le contenu'
       },
       search_query: {
         type: 'string',
-        description: 'A search topic (AI will generate multiple search terms from this)'
+        description: 'Un sujet de recherche (l\'IA générera plusieurs termes de recherche à partir de cela)'
       },
       search_terms: {
         type: 'array',
-        description: 'Pre-generated search terms (5-10 terms)',
+        description: 'Termes de recherche pré-générés (5-10 termes)',
         items: { type: 'string' }
       },
       max_results: {
         type: 'number',
-        description: 'Maximum number of search results per term (default: 3)',
+        description: 'Nombre maximum de résultats de recherche par terme (par défaut : 3)',
         default: 3
       },
       fetch_content: {
         type: 'boolean',
-        description: 'Whether to fetch and parse the content of found URLs (default: true)',
+        description: 'Récupérer et analyser le contenu des URLs trouvées (par défaut : true)',
         default: true
       }
     }

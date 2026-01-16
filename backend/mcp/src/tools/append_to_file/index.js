@@ -3,26 +3,26 @@ import path from 'path';
 
 export const appendToFileTool = {
   name: 'append_to_file',
-  description: 'Append content to a file. Creates the file if it does not exist. Useful for building the thesis document incrementally.',
+  description: 'Ajoute du contenu à un fichier. Crée le fichier s\'il n\'existe pas. Utile pour construire le document de thèse de manière incrémentale.',
   parameters: {
     type: 'object',
     properties: {
       file_path: {
         type: 'string',
-        description: 'Path to the file (relative to data directory)'
+        description: 'Chemin du fichier (relatif au répertoire data)'
       },
       content: {
         type: 'string',
-        description: 'Content to append to the file'
+        description: 'Contenu à ajouter au fichier'
       },
       add_newline: {
         type: 'boolean',
-        description: 'Whether to add a newline before the content (default: true)',
+        description: 'Ajouter une nouvelle ligne avant le contenu (par défaut : true)',
         default: true
       },
       create_if_missing: {
         type: 'boolean',
-        description: 'Whether to create the file if it does not exist (default: true)',
+        description: 'Créer le fichier s\'il n\'existe pas (par défaut : true)',
         default: true
       }
     },

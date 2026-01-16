@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.config import settings
 from backend.auth.routes.router import user_router
 from backend.agent.judge.router import judge_router
+from backend.mcp.router import router as mcp_router
 
 app = FastAPI(
     title="Auto Thesis API",
@@ -20,6 +21,7 @@ app.add_middleware(
 
 app.include_router(user_router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(judge_router, prefix="/api/v1/judge", tags=["Agent Judge"])
+app.include_router(mcp_router, prefix="/api/v1/mcp", tags=["MCP Tools"])
 
 @app.get("/")
 def root():
