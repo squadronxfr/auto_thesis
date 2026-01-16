@@ -30,10 +30,9 @@ docker compose --env-file devops/.env.example -f devops/compose/compose.prod.yml
 echo "📦 Téléchargement des nouvelles images..."
 docker compose --env-file devops/.env.example -f devops/compose/compose.prod.yml pull
 
-# Démarrage des services
+# Démarrage des servicess
 echo "🚀 Démarrage des services..."
 docker compose --env-file devops/.env.example -f devops/compose/compose.prod.yml up -d --remove-orphans
-
 
 echo "✅ Install/Deploy terminé"
 docker compose --env-file devops/.env.example -f devops/compose/compose.prod.yml ps

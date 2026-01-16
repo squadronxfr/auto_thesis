@@ -29,6 +29,8 @@ services:
       interval: 10s
       timeout: 3s
       retries: 20
+    ports:
+      - "40010:40010"
     networks:
       - app-network
 
