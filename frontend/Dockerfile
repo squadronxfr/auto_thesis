@@ -1,48 +1,25 @@
-FROM node:20-alpine
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Installer les deps (npm)
-COPY package.json ./
-RUN npm install
+# Install deps (works with or without package-lock.json)
+COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
-# Copier le code
+# App source
 COPY . .
 
-# Vite doit écouter sur 0.0.0.0 dans Docker
-EXPOSE 3000
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+# Vite build-time env
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
 
-# ========================= ICI C'EST LA VERSION DEV DU FRONTEND =================
-# FROM node:20-alpine
+RUN npm run build
 
-# WORKDIR /app
+FROM nginx:1.27-alpine
 
-# # --- Install deps ---
-# # Si tu as package-lock.json, copie-le aussi (recommandé)
-# COPY package.json ./
-# # COPY package-lock.json ./
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# # Si pas de package-lock, utilise npm install (moins reproductible, mais OK)
-# RUN npm install
+EXPOSE 80
 
-# # --- App source ---
-# COPY . .
-
-# # Variables Vite au build (injectées au build)
-# ARG VITE_API_URL
-# ENV VITE_API_URL=${VITE_API_URL}
-
-# # --- Build ---
-# RUN npm run build
-
-# # --- Serve static build ---
-# RUN npm i -g serve
-
-# EXPOSE 3000
-# CMD ["serve", "-s", "dist", "-l", "3000"]
-
-# # =========================
-# # (Option DEV) si tu veux un jour :
-# # CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
-# # =========================
+CMD ["nginx", "-g", "daemon off;"]
