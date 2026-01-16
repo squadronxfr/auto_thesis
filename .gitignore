@@ -423,3 +423,28 @@ FodyWeavers.xsd
 /backend/.venv
 /backend/.env
 .github
+
+# ============================================
+# Fichiers de test - NE PAS PUSH
+# ============================================
+# Tests d'intégration avec dataset
+**/test_dataset.py
+**/test_integration.py
+**/view_dataset.py
+**/check_env.py
+**/TESTS_README.md
+**/GUIDE_RAPIDE_TESTS.md
+**/START_HERE.md
+**/run_tests.bat
+**/view_dataset.bat
+**/check_env.bat
+
+# Cache et résultats de tests
+**/__pycache__/
+**/.pytest_cache/
+**/*.pyc
+**/*.pyo
+**/.coverage
+**/htmlcov/
+**/.tox/
+**/.hypothesis/

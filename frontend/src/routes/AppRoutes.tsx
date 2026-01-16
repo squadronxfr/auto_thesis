@@ -11,8 +11,10 @@ import Error from '@/features/Error';
 import { Login, Register, ForgotPassword } from '@/features/auth';
 import { LandingPage } from '@/features/landing';
 import { DashboardCustomer } from '@/features/documents';
+import { UploadDocument } from '@/features/upload';
 
 import { useMetadata } from '@/lib/metadata';
+import { AdminDashboard } from '@/features/admin';
 
 export function AppRoutes() {
 
@@ -47,13 +49,14 @@ export function AppRoutes() {
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
                             <Route path="/forgot-password" element={<ForgotPassword />} />
-                            <Route path="/dashboard" element={<DashboardCustomer />} />
                         </Route>
 
                         {/* Routes privées */}
                         <Route element={<PrivateRoutes />}>
                             <Route path="/app" element={<Navigate to="/profile" replace />} />
                             <Route path="/dashboard" element={<DashboardCustomer />} />
+                            <Route path="/upload" element={<UploadDocument />} />
+                            <Route path="/admin" element={<AdminDashboard />} />
                         </Route>
 
                         {/* Routes d'erreur */}

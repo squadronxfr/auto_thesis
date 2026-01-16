@@ -62,7 +62,7 @@ export function Register() {
     const strength = calculatePasswordStrength(password);
 
     const handleNextStep = async () => {
-        const isValid = await trigger(['firstName', 'lastName', 'email']);
+        const isValid = await trigger(['first_name', 'last_name', 'email']);
         if (isValid) setStep(2);
     };
 
@@ -179,38 +179,38 @@ export function Register() {
                                             >
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-1.5">
-                                                        <label htmlFor="firstName" className="text-xs font-semibold text-white/70 ml-1">
+                                                        <label htmlFor="first_name" className="text-xs font-semibold text-white/70 ml-1">
                                                             Prénom
                                                         </label>
                                                         <Input
-                                                            id="firstName"
+                                                            id="first_name"
                                                             label=""
-                                                            {...register('firstName')}
+                                                            {...register('first_name')}
                                                             placeholder="Jean"
                                                             className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:ring-secondary/30 focus:border-secondary/50 transition-all"
-                                                            aria-invalid={!!errors.firstName}
+                                                            aria-invalid={!!errors.first_name}
                                                         />
-                                                        {errors.firstName && (
+                                                        {errors.first_name && (
                                                             <p className="text-red-400 text-xs mt-1 ml-1 animate-fade-in">
-                                                                {errors.firstName.message}
+                                                                {errors.first_name.message}
                                                             </p>
                                                         )}
                                                     </div>
                                                     <div className="space-y-1.5">
-                                                        <label htmlFor="lastName" className="text-xs font-semibold text-white/70 ml-1">
+                                                        <label htmlFor="last_name" className="text-xs font-semibold text-white/70 ml-1">
                                                             Nom
                                                         </label>
                                                         <Input
-                                                            id="lastName"
+                                                            id="last_name"
                                                             label=""
-                                                            {...register('lastName')}
+                                                            {...register('last_name')}
                                                             placeholder="Dupont"
                                                             className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:ring-secondary/30 focus:border-secondary/50 transition-all"
-                                                            aria-invalid={!!errors.lastName}
+                                                            aria-invalid={!!errors.last_name}
                                                         />
-                                                        {errors.lastName && (
+                                                        {errors.last_name && (
                                                             <p className="text-red-400 text-xs mt-1 ml-1 animate-fade-in">
-                                                                {errors.lastName.message}
+                                                                {errors.last_name.message}
                                                             </p>
                                                         )}
                                                     </div>

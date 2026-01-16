@@ -2,14 +2,7 @@ import os
 import google.generativeai as genai
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
-from dotenv import load_dotenv
 from backend.config.settings import settings
-
-# Charge les variables d'environnement
-load_dotenv()
-
-# Configuration de Gemini
-
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
@@ -33,7 +26,6 @@ class BaseAgent:
             model_name=self.config.model_name,
             system_instruction=self.config.system_instruction
         )
-        print(f"✅ Agent {config.name} initialisé avec Gemini")
     
     async def process(self, input_data: AgentInput):
         """
