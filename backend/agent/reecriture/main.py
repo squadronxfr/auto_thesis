@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 import sys
 import os
+import uuid
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -25,7 +26,7 @@ class RewriteRequest(BaseModel):
     ids_sources_existantes: List[str] = []
     contexte: str = None
     iteration: int = 1
-    id_document: str = "default"
+    id_document: str = Field(default_factory=lambda: str(uuid.uuid4()))
 
     class Config:
         schema_extra = {
