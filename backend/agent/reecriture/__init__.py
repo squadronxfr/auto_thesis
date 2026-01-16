@@ -1,7 +1,6 @@
 """Package de réécriture académique."""
 
 __all__ = [
-    'SortieReecriture', 
     'CritiqueJuge',
     'CritiqueResolue',
     'ProblemeNonResolu',
