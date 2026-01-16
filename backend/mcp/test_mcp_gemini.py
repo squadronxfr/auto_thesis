@@ -304,11 +304,11 @@ Search and save."""
         
         # Thesis topic
         topics = [
-            "Artificial Intelligence in Healthcare: Current Applications and Challenges",
-            "Machine Learning Approaches to Medical Diagnosis and Treatment",
-            "Ethical Considerations in AI-Powered Healthcare Systems",
-            "Deep Learning for Personalized Medicine and Drug Discovery",
-            "AI Implementation Barriers in Clinical Practice Settings"
+            "Intelligence Artificielle dans la Santé : Applications Actuelles et Défis",
+            "Approches d'Apprentissage Automatique pour le Diagnostic et le Traitement Médical",
+            "Considérations Éthiques dans les Systèmes de Santé Alimentés par l'IA",
+            "Apprentissage Profond pour la Médecine Personnalisée et la Découverte de Médicaments",
+            "Barrières à l'Implémentation de l'IA en Pratique Clinique"
         ]
         import random
         selected_topic = random.choice(topics)
@@ -317,40 +317,41 @@ Search and save."""
         self._print_info("Step 3: Generating PART 1 (Introduction)")
         
         # PART 1
-        part1_prompt = f"""You are writing the INTRODUCTION of a master's thesis.
+        part1_prompt = f"""Vous rédigez l'INTRODUCTION d'un mémoire de master.
 
-RESEARCH SOURCES YOU MUST CITE:
+SOURCES DE RECHERCHE QUE VOUS DEVEZ CITER :
 {web_text}
 
-TOPIC: {selected_topic}
+SUJET : {selected_topic}
 
-REQUIREMENTS FOR PART 1 - INTRODUCTION:
-1. Start with: # Introduction: {selected_topic}
-2. Use proper Markdown headers: ## for sections, ### for subsections
-3. Target: 2000-2500 words
-4. CITE SOURCES USING NUMBERS: [1], [2], [3], etc.
-5. Must include at least 8 citations from numbered sources
-6. Distribute citations throughout
+EXIGENCES POUR LA PARTIE 1 - INTRODUCTION :
+1. Commencez par : # Introduction : {selected_topic}
+2. Utilisez des en-têtes Markdown appropriés : ## pour les sections, ### pour les sous-sections
+3. Objectif : 2000-2500 mots
+4. CITEZ LES SOURCES EN UTILISANT DES NUMÉROS : [1], [2], [3], etc.
+5. Doit inclure au moins 8 citations des sources numérotées
+6. Distribuez les citations tout au long du texte
 
-STRUCTURE (use exactly these headers):
-## Introduction Overview
-Explain the thesis scope and relevance
+STRUCTURE (utilisez exactement ces en-têtes) :
+## Vue d'ensemble de l'introduction
+Expliquez la portée et la pertinence de la thèse
 
-## Context and Background
-Provide historical context
+## Contexte et arrière-plan
+Fournissez le contexte historique
 
-## Problem Statement  
-Define the main problem addressed
+## Énoncé du problème
+Définissez le problème principal abordé
 
-## Research Objectives
-State clear objectives
+## Objectifs de recherche
+Énoncez des objectifs clairs
 
-## Thesis Structure
-Brief overview of what follows
+## Structure de la thèse
+Bref aperçu de ce qui suit
 
-Write in academic style, comprehensive and detailed.
-DO NOT include references section yet.
-USE NUMBERED CITATIONS [1], [2], [3] etc."""
+Écrivez dans un style académique, complet et détaillé.
+N'incluez PAS encore la section références.
+UTILISEZ DES CITATIONS NUMÉROTÉES [1], [2], [3] etc.
+ÉCRIVEZ EN FRANÇAIS."""
         
         try:
             response = self.client.models.generate_content(
@@ -376,42 +377,43 @@ USE NUMBERED CITATIONS [1], [2], [3] etc."""
         self._print_info("Step 4: Generating PART 2 (Body/Chapters)")
         
         # PART 2
-        part2_prompt = f"""You are writing the BODY/MAIN CHAPTERS of a master's thesis.
+        part2_prompt = f"""Vous rédigez le CORPS/CHAPITRES PRINCIPAUX d'un mémoire de master.
 
-RESEARCH SOURCES YOU MUST CITE:
+SOURCES DE RECHERCHE QUE VOUS DEVEZ CITER :
 {web_text}
 
-TOPIC: {selected_topic}
+SUJET : {selected_topic}
 
-PREVIOUS PART SUMMARY (for continuity):
+RÉSUMÉ DE LA PARTIE PRÉCÉDENTE (pour la continuité) :
 {part1_summary}
 
-REQUIREMENTS FOR PART 2 - BODY:
-1. Start with: # Body: Main Chapters
-2. Use proper Markdown headers: ## for chapters, ### for sections
-3. Target: 2500-3000 words
-4. CITE SOURCES USING NUMBERS: [1], [2], [3], etc. (same as before)
-5. Must include at least 10 citations from numbered sources
-6. Expand on the problem statement with detailed analysis
-7. Distribute citations throughout
+EXIGENCES POUR LA PARTIE 2 - CORPS :
+1. Commencez par : # Corps : Chapitres principaux
+2. Utilisez des en-têtes Markdown appropriés : ## pour les chapitres, ### pour les sections
+3. Objectif : 2500-3000 mots
+4. CITEZ LES SOURCES EN UTILISANT DES NUMÉROS : [1], [2], [3], etc. (comme avant)
+5. Doit inclure au moins 10 citations des sources numérotées
+6. Développez l'énoncé du problème avec une analyse détaillée
+7. Distribuez les citations tout au long du texte
 
-STRUCTURE (use exactly these headers):
-## Chapter 1: Literature Review
-Review existing research and key findings
+STRUCTURE (utilisez exactement ces en-têtes) :
+## Chapitre 1 : Revue de littérature
+Examinez les recherches existantes et les résultats clés
 
-## Chapter 2: Methodology and Analysis
-Discuss methodological approaches
+## Chapitre 2 : Méthodologie et analyse
+Discutez des approches méthodologiques
 
-## Chapter 3: Current Implementations
-Analyze real-world implementations
+## Chapitre 3 : Implémentations actuelles
+Analysez les implémentations dans le monde réel
 
-## Chapter 4: Challenges and Solutions
-Discuss challenges and potential solutions
+## Chapitre 4 : Défis et solutions
+Discutez des défis et des solutions potentielles
 
-Write in academic style, comprehensive and detailed.
-DO NOT include references section yet.
-USE NUMBERED CITATIONS [1], [2], [3] etc.
-Ensure continuity with the introduction."""
+Écrivez dans un style académique, complet et détaillé.
+N'incluez PAS encore la section références.
+UTILISEZ DES CITATIONS NUMÉROTÉES [1], [2], [3] etc.
+Assurez la continuité avec l'introduction.
+ÉCRIVEZ EN FRANÇAIS."""
         
         try:
             response = self.client.models.generate_content(
@@ -437,48 +439,49 @@ Ensure continuity with the introduction."""
         self._print_info("Step 5: Generating PART 3 (Conclusion + References)")
         
         # PART 3
-        part3_prompt = f"""You are writing the CONCLUSION of a master's thesis.
+        part3_prompt = f"""Vous rédigez la CONCLUSION d'un mémoire de master.
 
-RESEARCH SOURCES YOU MUST CITE:
+SOURCES DE RECHERCHE QUE VOUS DEVEZ CITER :
 {web_text}
 
-TOPIC: {selected_topic}
+SUJET : {selected_topic}
 
-PREVIOUS PARTS SUMMARY (for continuity):
-Introduction: {part1_summary}
+RÉSUMÉ DES PARTIES PRÉCÉDENTES (pour la continuité) :
+Introduction : {part1_summary}
 
-Main Body: {part2_summary}
+Corps principal : {part2_summary}
 
-REQUIREMENTS FOR PART 3 - CONCLUSION:
-1. Start with: # Conclusion
-2. Use proper Markdown headers: ## for sections
-3. Target: 1500-2000 words
-4. CITE SOURCES USING NUMBERS: [1], [2], [3], etc. (same as before)
-5. Must include at least 5 citations
-6. Summarize key findings and synthesis
+EXIGENCES POUR LA PARTIE 3 - CONCLUSION :
+1. Commencez par : # Conclusion
+2. Utilisez des en-têtes Markdown appropriés : ## pour les sections
+3. Objectif : 1500-2000 mots
+4. CITEZ LES SOURCES EN UTILISANT DES NUMÉROS : [1], [2], [3], etc. (comme avant)
+5. Doit inclure au moins 5 citations
+6. Résumez les résultats clés et la synthèse
 
-STRUCTURE (use exactly these headers):
-## Summary of Key Findings
-Recap main points from body
+STRUCTURE (utilisez exactement ces en-têtes) :
+## Résumé des résultats clés
+Récapitulez les points principaux du corps
 
-## Implications and Impact
-Discuss broader implications
+## Implications et impact
+Discutez des implications plus larges
 
-## Future Research Directions
-Suggest areas for future work
+## Orientations de recherche futures
+Suggérez des domaines pour des travaux futurs
 
-## Final Conclusions
-Conclude the thesis
+## Conclusions finales
+Concluez la thèse
 
-## References
-List all {len(web_results)} sources using format:
-[1] Title, URL
-[2] Title, URL
+## Références
+Listez toutes les {len(web_results)} sources en utilisant le format :
+[1] Titre, URL
+[2] Titre, URL
 etc.
 
-Write in academic style, comprehensive and detailed.
-USE NUMBERED CITATIONS [1], [2], [3] etc.
-Ensure the references section is complete and accurate."""
+Écrivez dans un style académique, complet et détaillé.
+UTILISEZ DES CITATIONS NUMÉROTÉES [1], [2], [3] etc.
+Assurez-vous que la section des références est complète et précise.
+ÉCRIVEZ EN FRANÇAIS."""
         
         try:
             response = self.client.models.generate_content(
