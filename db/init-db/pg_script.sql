@@ -1,12 +1,12 @@
 -- USER
 
-CREATE TABLE USER (
+CREATE TABLE "USER" (
     id BIGSERIAL PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('ADMIN', 'USER')),
+    role TEXT NOT NULL DEFAULT 'USER' CHECK (role IN ('ADMIN', 'USER')),
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
     updated_at  TIMESTAMP NOT NULL DEFAULT now()
 );
@@ -20,7 +20,7 @@ CREATE TABLE TOKEN (
     user_id BIGINT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(), 
     CONSTRAINT fk_token_user
-        FOREIGN KEY (user_id) REFERENCES USER(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES "USER"(id) ON DELETE CASCADE
 );
  
 
@@ -33,7 +33,7 @@ CREATE TABLE REQUEST (
     user_id BIGINT NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT now(),
     CONSTRAINT fk_request_user
-        FOREIGN KEY (user_id) REFERENCES USER(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES "USER"(id) ON DELETE CASCADE
 );
  
 
@@ -61,7 +61,7 @@ CREATE TABLE DOCUMENT (
     CONSTRAINT fk_document_request
         FOREIGN KEY (request_id) REFERENCES REQUEST(id) ON DELETE CASCADE,
     CONSTRAINT fk_document_user
-        FOREIGN KEY (user_id) REFERENCES USER(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES "USER"(id) ON DELETE CASCADE
 );
  
 

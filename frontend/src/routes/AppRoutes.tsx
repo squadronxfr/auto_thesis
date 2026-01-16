@@ -5,22 +5,16 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { useAutoLogin } from '@/api/queries';
 
-import { Sidebar } from '@/components/layout';
 import { Loader } from '@/components/ui';
 
 import Error from '@/features/Error';
 import { Login, Register, ForgotPassword } from '@/features/auth';
 import { LandingPage } from '@/features/landing';
-import { Profile } from '@/features/user';
-import { Users } from '@/features/users';
 import { DashboardCustomer } from '@/features/documents';
 
 import { useMetadata } from '@/lib/metadata';
 
-import { useAuthStore } from '@/stores/authStore';
-
 export function AppRoutes() {
-    const { isAuthenticated } = useAuthStore();
 
     const { helmet } = useMetadata({
         title: 'Auto Thesis - Génération de mémoires par IA agentique',
@@ -43,7 +37,6 @@ export function AppRoutes() {
         <Fragment>
             {helmet}
             <div className="flex min-h-screen flex-row gap-4">
-                {isAuthenticated && <Sidebar />}
                 <main className="flex-grow">
                     <Routes>
                         {/* Landing page publique */}

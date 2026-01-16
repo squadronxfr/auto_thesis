@@ -11,13 +11,7 @@ export const registerSchema = z.object({
     lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
     email: z.string().email('Email invalide'),
     password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
-    confirmPassword: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
-    acceptTerms: z.boolean().refine((val) => val === true, {
-        message: 'Vous devez accepter les conditions d\'utilisation',
-    }),
-    acceptPrivacy: z.boolean().refine((val) => val === true, {
-        message: 'Vous devez accepter la politique de confidentialité',
-    }),
+    confirmPassword: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères')
 }).refine((data) => data.password === data.confirmPassword, {
     message: 'Les mots de passe ne correspondent pas',
     path: ['confirmPassword'],

@@ -112,7 +112,7 @@ const CONTRIBUTORS = [
   { name: "Souhir BEJI", github: "souhirbeji", avatar: "https://github.com/souhirbeji.png" },
   { name: "Medamine KORNITI", github: "MedAmine000", avatar: "https://github.com/MedAmine000.png" },
   { name: "Elyes ADDENRI", github: "Madoff77", avatar: "https://github.com/Madoff77.png" },
-  { name: "Lyes AIT TAYER", github: "lyesatb", avatar: "https://github.com/lyesatb.png" },
+  { name: "Lyes AIT TAYEB", github: "lyesatb", avatar: "https://github.com/lyesatb.png" },
   { name: "Rayan DZIRI", github: "DzRayane", avatar: "https://github.com/DzRayane.png" },
   { name: "Amine CHERIF", github: "Aminechf11", avatar: "https://github.com/Aminechf11.png" }
 ];

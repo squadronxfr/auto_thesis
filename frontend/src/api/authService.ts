@@ -16,8 +16,8 @@ import Cookies from 'js-cookie';
 
 class AuthService {
     public async registerUser(user: RegisterDto): Promise<AuthResponse> {
-        const response = await api.fetchRequest('/register', 'POST', user);
-        if (response.accessToken) {
+        const response = await api.fetchRequest('/auth/register', 'POST', user);
+        if (response.token) {
             Cookies.set('accessToken', response.accessToken, { expires: 1 });
             Cookies.set('refreshToken', response.refreshToken, { expires: 30 });
         }
@@ -25,13 +25,9 @@ class AuthService {
     }
 
     public async loginUser(credentials: LoginSchema): Promise<AuthResponse> {
-        const response = await api.fetchRequest('/login', 'POST', credentials);
-        if (response.accessToken) {
-            Cookies.set('accessToken', response.accessToken, { expires: 1 });
-
-            if (credentials.rememberMe) {
-                Cookies.set('refreshToken', response.refreshToken, { expires: 30 });
-            }
+        const response = await api.fetchRequest('/auth/login', 'POST', credentials);
+        if (response.token) {
+            Cookies.set('accessToken', response.token, { expires: 1 });
         }
         return response;
     }

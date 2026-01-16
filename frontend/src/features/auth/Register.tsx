@@ -165,7 +165,7 @@ export function Register() {
                                     </motion.div>
                                 )}
 
-                                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                                <form onSubmit={handleSubmit(onSubmit, (e) => console.error("Validation errors:", e))} className="space-y-5">
                                     <AnimatePresence mode="wait" custom={step === 2 ? 1 : -1}>
                                         {step === 1 ? (
                                             <motion.div
@@ -312,12 +312,7 @@ export function Register() {
                                                     <Button
                                                         type="submit"
                                                         variant="primary"
-                                                        disabled={
-                                                            isSubmitting ||
-                                                            isPending ||
-                                                            password !== confirmPassword ||
-                                                            password.length === 0
-                                                        }
+                                                        disabled={isSubmitting || isPending}
                                                         className="w-full h-12 rounded-xl font-bold flex items-center justify-center gap-2"
                                                     >
                                                         {isSubmitting || isPending ? (

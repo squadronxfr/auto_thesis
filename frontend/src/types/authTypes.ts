@@ -16,8 +16,13 @@ export interface LoginCredentials {
 
 // Réponse de l'API après authentification
 export interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
+    token: string;
+    user: {
+        id: string;
+        email: string;
+        first_name: string;
+        last_name: string;
+    }
 }
 
 // Réponse complète incluant l'utilisateur
