@@ -14,6 +14,7 @@ import { LandingPage } from '@/features/landing';
 import { Profile } from '@/features/user';
 import { Users } from '@/features/users';
 import { DashboardCustomer } from '@/features/documents';
+import { UploadDocument } from '@/features/upload';
 
 import { useMetadata } from '@/lib/metadata';
 
@@ -57,6 +58,8 @@ export function AppRoutes() {
                             <Route path="/forgot-password" element={<ForgotPassword />} />
                             <Route path="/dashboard" element={<DashboardCustomer />} />
                             <Route path="/admin" element={<AdminDashboard />} />
+                            <Route path="/upload" element={<UploadDocument />} />
+
                         </Route>
 
                         {/* Routes privées */}
