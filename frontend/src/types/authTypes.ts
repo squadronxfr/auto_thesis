@@ -5,7 +5,6 @@ export interface RegisterCredentials {
     first_name: string;
     last_name: string;
     email: string;
-    phone: string;
 }
 
 // Données de connexion

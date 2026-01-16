@@ -4,7 +4,6 @@ export const userUpdateSchema = z.object({
     first_name: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères').optional(),
     last_name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').optional(),
     email: z.string().email('Email invalide').optional(),
-    phoneNumber: z.string().optional(),
 });
 
 export const userFiltersSchema = z.object({
@@ -12,7 +11,6 @@ export const userFiltersSchema = z.object({
     first_name: z.string().optional(),
     last_name: z.string().optional(),
     email: z.string().optional(),
-    phoneNumber: z.string().optional(),
     page: z.string().optional(),
     limit: z.string().optional(),
 });
@@ -26,7 +24,6 @@ export interface UserDto {
     email: string;
     first_name: string;
     last_name: string;
-    phoneNumber?: string;
     roles: string[];
     createdAt: string;
     updatedAt: string;

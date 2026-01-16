@@ -6,7 +6,6 @@ import {
     Mail,
     Shield,
     Calendar,
-    Eye,
     MessageCircle,
 } from 'lucide-react';
 import { Button, Card, Input } from '@/components/ui';
@@ -61,11 +60,6 @@ export function AdminDashboard() {
     };
 
     // Handlers pour les actions
-    const handleViewClient = (clientId: string) => {
-        console.log('Voir le client:', clientId);
-        // À implémenter: ouvrir un modal ou rediriger vers la page du client
-    };
-
     const handleContactClient = (email: string, first_name: string, last_name: string) => {
         window.location.href = `mailto:${email}?subject=Suivi - ${first_name} ${last_name}`;
     };
@@ -240,14 +234,6 @@ export function AdminDashboard() {
 
                                                 {/* Actions */}
                                                 <div className="flex items-center gap-2 flex-shrink-0">
-                                                    <Button
-                                                        variant="secondary"
-                                                        className="flex items-center gap-2 text-sm md:text-base"
-                                                        onClick={() => handleViewClient(client.id)}
-                                                    >
-                                                        <Eye size={16} className="md:w-[18px] md:h-[18px]" />
-                                                        <span className="hidden sm:inline">Voir</span>
-                                                    </Button>
                                                     <Button
                                                         variant="ghost"
                                                         className="flex items-center gap-2 text-sm md:text-base text-slate-300 hover:text-[#126FFF]"

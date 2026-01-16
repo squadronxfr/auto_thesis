@@ -175,20 +175,6 @@ export function Users() {
                                 className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 transition duration-150 ease-in-out focus:z-10 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary sm:text-sm"
                             />
                         </div>
-                        <div>
-                            <label className="mb-1 block text-xs font-medium text-gray-700">
-                                Téléphone
-                            </label>
-                            <input
-                                type="tel"
-                                placeholder="Numéro de téléphone..."
-                                value={filters.phoneNumber || ''}
-                                onChange={(e) =>
-                                    updateFilters({ phoneNumber: e.target.value || undefined })
-                                }
-                                className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 transition duration-150 ease-in-out focus:z-10 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary sm:text-sm"
-                            />
-                        </div>
                     </div>
                 )}
             </div>
