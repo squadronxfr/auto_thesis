@@ -49,22 +49,3 @@ async def register_user(user: RegisterRequest):
 @user_router.post("/login")
 async def login_user(credentials: LoginRequest):
     return {"message": "Login endpoint", "email": credentials.email}
-
-# @user_router.post("/logout")
-# async def logout_user(authorization: str | None = Header(default=None), db=Depends(get_db)):
-#     token_string = extract_bearer_token(authorization)
-#
-#     try:
-#         jwt.decode(token_string, SECRET_KEY, algorithms=[ALGORITHM])
-#     except JWTError:
-#         raise HTTPException(status_code=401, detail="Token invalide ou expiré")
-#
-#     result = await db.execute(
-#         "DELETE FROM token WHERE token_string = $1",
-#         token_string
-#     )
-#
-#     if result.startswith("DELETE 0"):
-#         raise HTTPException(status_code=401, detail="Token déjà révoqué ou inexistant")
-#
-#     return {"message": "Déconnexion réussie"}

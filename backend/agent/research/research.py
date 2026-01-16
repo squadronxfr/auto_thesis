@@ -78,18 +78,18 @@ class ResearchAgent:
             plan: str,
             contraintes: str = ""
     ):
-        print("DEBUG: Verification connexion MCP...")
+        print("Checking MCP server health...")
         mcp_healthy = await self.mcp_client.health_check()
         if not mcp_healthy:
-            return {"error": "Serveur MCP non disponible sur http://localhost:3000"}
+            return {"error": "MCP server unavailable at http://localhost:3000"}
 
-        print("DEBUG: MCP connecte")
+        print("MCP connected successfully")
 
         search_query = f"{sujet} {problematique}"
         if contraintes:
             search_query += f" {contraintes}"
 
-        print(f"DEBUG: Recherche MCP avec query: {search_query}")
+        print(f"Searching MCP with query: {search_query}")
 
         mcp_response = await self.mcp_client.fetch_url_content(
             search_query=search_query,
@@ -98,17 +98,17 @@ class ResearchAgent:
         )
 
         if not mcp_response.get('success'):
-            error_msg = mcp_response.get('error', 'Erreur inconnue')
-            print(f"ERROR: MCP fetch_url_content failed: {error_msg}")
-            return {"error": f"Recherche MCP echouee: {error_msg}"}
+            error_msg = mcp_response.get('error', 'Unknown error')
+            print(f"MCP fetch_url_content failed: {error_msg}")
+            return {"error": f"MCP search failed: {error_msg}"}
 
         result_data = mcp_response.get('result', {})
         raw_sources = result_data.get('results', [])
 
-        print(f"DEBUG: MCP a trouve {len(raw_sources)} sources brutes")
+        print(f"MCP found {len(raw_sources)} raw sources")
 
         if len(raw_sources) == 0:
-            return {"error": "Aucune source trouvee par MCP"}
+            return {"error": "No sources found by MCP"}
 
         sources_text = self._format_sources_for_gemini(raw_sources)
 
@@ -139,10 +139,10 @@ class ResearchAgent:
         """
 
         try:
-            print("DEBUG: Envoi a Gemini pour analyse...")
-            response = self.model.generate_content(prompt)
+            print("Sending to Gemini for analysis...")
+            response = await self.model.generate_content_async(prompt)
 
-            if response.candidates[0].content.parts[0].function_call:
+            if response.candidates and response.candidates[0].content.parts and response.candidates[0].content.parts[0].function_call:
                 function_call = response.candidates[0].content.parts[0].function_call
 
                 if function_call.name == "return_research_results":
@@ -156,18 +156,18 @@ class ResearchAgent:
                             source['date'] = "Date inconnue"
 
                     result_obj = ResearchResult(**args)
-                    print(f"DEBUG: Analyse terminee - {result_obj.nombre_sources} sources pertinentes")
+                    print(f"Analysis complete - {result_obj.nombre_sources} relevant sources found")
                     return result_obj
                 else:
-                    return {"error": f"Fonction inattendue: {function_call.name}"}
+                    return {"error": f"Unexpected function called: {function_call.name}"}
             else:
-                return {"error": "Gemini n'a pas appele de fonction", "text": response.text}
+                return {"error": "Gemini did not call any function", "text": response.text}
 
         except Exception as e:
-            print(f"ERROR: Exception dans search_sources: {str(e)}")
+            print(f"Exception in search_sources: {str(e)}")
             import traceback
             traceback.print_exc()
-            return {"error": f"Erreur: {str(e)}"}
+            return {"error": f"Error: {str(e)}"}
 
     def _format_sources_for_gemini(self, raw_sources: List[Dict]) -> str:
         formatted = []
@@ -178,9 +178,9 @@ class ResearchAgent:
 
             formatted.append(f"""
             [SOURCE {i}]
-            Titre: {title}
+            Title: {title}
             URL: {url}
-            Contenu:
+            Content:
             {content[:2000]}...
             """)
 
