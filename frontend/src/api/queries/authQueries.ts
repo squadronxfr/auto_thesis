@@ -15,11 +15,11 @@ import Cookies from 'js-cookie';
  * @returns {Object} Mutation pour l'inscription
  */
 export const useRegister = () => {
-    const { login, setUser } = useAuthStore();
+    const { login, setUser, setIsAuthenticated } = useAuthStore();
 
     return useMutation({
         mutationFn: async (userData: RegisterDto) => {
-            const response = await authService.registerUser({"first_name":userData.firstName,"last_name":userData.lastName,"email":userData.email,"password":userData.password});
+            const response = await authService.registerUser({"first_name":userData.first_name,"last_name":userData.last_name,"email":userData.email,"password":userData.password});
             if (response.token) {
                 login(response.token);
 
@@ -27,6 +27,7 @@ export const useRegister = () => {
                 const user = await authService.getUserByToken(response.token);
                 if (user) {
                     setUser(user.data);
+                    setIsAuthenticated(true);
                     // Add user to cache
                     queryClient.setQueryData(['user'], user.data);
                 }
@@ -47,7 +48,7 @@ export const useRegister = () => {
  * @returns {Object} Mutation pour la connexion
  */
 export const useLogin = () => {
-    const { login, setUser } = useAuthStore();
+    const { login, setUser, setIsAuthenticated } = useAuthStore();
 
     return useMutation<
         { token: string },
@@ -64,6 +65,7 @@ export const useLogin = () => {
                 const user = await authService.getUserByToken(response.token);
                 if (user) {
                     setUser(user.data);
+                    setIsAuthenticated(true);
                     // Add user to cache
                     queryClient.setQueryData(['user'], user.data);
                 }
