@@ -2,8 +2,6 @@
 -- STRUCTURE DE LA BASE DE DONNÉES (SCHEMA)
 -- ==========================================
 
--- TABLES
-
 CREATE TABLE "USER" (
     id BIGSERIAL PRIMARY KEY,
     first_name TEXT NOT NULL,

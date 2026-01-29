@@ -29,21 +29,6 @@ const Section = ({ children, className = "", id = "" }: { children: React.ReactN
 );
 
 
-const FeatureCard = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    className="p-8 rounded-xl bg-white/5 border border-white/10 hover:border-[#126FFF]/50 transition-colors group"
-  >
-    <div className="w-12 h-12 rounded-lg bg-[#126FFF]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-      <Icon className="text-[#126FFF] w-6 h-6" />
-    </div>
-    <h3 className="text-xl font-bold mb-3 text-white">{title}</h3>
-    <p className="text-slate-400 text-sm leading-relaxed">{description}</p>
-  </motion.div>
-);
-
 const StepIndicator = ({ step, title, description, isActive }: { step: number, title: string, description: string, isActive: boolean }) => (
   <div className="flex gap-6 items-start">
     <div className="flex flex-col items-center">

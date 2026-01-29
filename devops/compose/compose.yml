@@ -1,0 +1,129 @@
+services:
+  postgres:
+    build:
+      context: ../../DB
+      dockerfile: Dockerfile
+    image: auto_thesis-postgres:16
+    container_name: auto_thesis_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_HOST_PORT:-40003}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: auto_thesis_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_HOST_PORT:-40010}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
+  # backend:
+  #   build:
+  #     context: ../../backend
+  #   container_name: ${COMPOSE_PROJECT_NAME:-auto_thesis}_backend
+  #   environment:
+  #     NODE_ENV: ${NODE_ENV:-production}
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     REDIS_URL: ${REDIS_URL}
+  #     BACKEND_PORT: ${BACKEND_PORT:-8080}
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   expose:
+  #     - "${BACKEND_PORT:-8080}"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "wget -qO- http://localhost:$${BACKEND_PORT:-8080}/health || exit 1"]
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 10
+
+  # mcp:
+  #   build:
+  #     context: ../../mcp
+  #   container_name: ${COMPOSE_PROJECT_NAME:-auto_thesis}_mcp
+  #   environment:
+  #     NODE_ENV: ${NODE_ENV:-production}
+  #     MCP_PORT: ${MCP_PORT:-8081}
+  #     REDIS_URL: ${REDIS_URL}
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   expose:
+  #     - "${MCP_PORT:-8081}"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "wget -qO- http://localhost:$${MCP_PORT:-8081}/health || exit 1"]
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 10
+
+  # agents:
+  #   build:
+  #     context: ../../agents
+  #   environment:
+  #     NODE_ENV: ${NODE_ENV:-production}
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     REDIS_URL: ${REDIS_URL}
+  #     MCP_URL: ${MCP_URL}
+  #     AGENTS_CONCURRENCY: ${AGENTS_CONCURRENCY:-2}
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #     mcp:
+  #       condition: service_healthy
+  #   # pas de ports : les agents n'ont pas besoin d'être exposés
+  #   restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    container_name: auto_thesis_frontend
+    ports:
+      - "${FRONTEND_HOST_PORT:-40000}:80"
+    # depends_on:
+    #   backend:
+    #     condition: service_healthy
+    restart: unless-stopped
+
+
+  # nginx:
+  #   image: nginx:1.27-alpine
+  #   container_name: ${COMPOSE_PROJECT_NAME:-auto_thesis}_nginx
+  #   depends_on:
+  #     frontend:
+  #       condition: service_started
+  #     backend:
+  #       condition: service_healthy
+  #     mcp:
+  #       condition: service_healthy
+  #   ports:
+  #     - "${HTTP_PORT:-80}:80"
+  #   volumes:
+  #     - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #   restart: unless-stopped
+
+volumes:
+  pg_data:
+  redis_data:
